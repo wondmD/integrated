@@ -9,4 +9,5 @@ urlpatterns = [
     path('monopitch/', include('monopitch.urls')),
     path('flatroof/', include('flatroof.urls')),
     path('duopitch/', include('duopitch.urls')),
-]   
+    path('hipped_roof/', include('Wind_load_analysis_on_hipped_roof.urls')),
+]

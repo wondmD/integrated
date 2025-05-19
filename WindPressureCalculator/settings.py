@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'monopitch',
     'flatroof',
     'duopitch',
+    'Wind_load_analysis_on_hipped_roof'
 ]
 
 MIDDLEWARE = [
