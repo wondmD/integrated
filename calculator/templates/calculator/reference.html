@@ -1,0 +1,14 @@
+{% extends 'calculator/base.html' %}
+{% block content %}
+<div class="container py-5">
+    <h1>References - Eurocode EN 1991-1-4</h1>
+    <h3>Site Altitude</h3>
+    <table class="table">
+        <tr><th>Altitude (m)</th><th>ρ (kg/m³)</th></tr>
+        {% for alt, rho in standards.site_altitude %}
+        <tr><td>{{ alt }}</td><td>{{ rho }}</td></tr>
+        {% endfor %}
+    </table>
+    <!-- Add tables for terrain and C_pe -->
+</div>
+{% endblock %}

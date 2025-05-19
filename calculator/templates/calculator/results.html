@@ -1,0 +1,152 @@
+{% extends 'calculator/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0 animate__animated animate__fadeIn">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0"><i class="fas fa-table me-2"></i>Calculation Results</h2>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-3">Input Parameters</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Height (h):</strong> {{ calculation.height }} m</li>
+                                <li class="list-group-item"><strong>In-wind Depth (b):</strong> {{ calculation.in_wind_depth }} m</li>
+                                <li class="list-group-item"><strong>Width (d):</strong> {{ calculation.width }} m</li>
+                                <li class="list-group-item"><strong>h/d Ratio:</strong> {{ h_d_ratio|floatformat:2 }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Site Altitude:</strong> {{ calculation.site_altitude }} m</li>
+                                <li class="list-group-item"><strong>Terrain Category:</strong> {{ calculation.terrain_category }}</li>
+                                <li class="list-group-item"><strong>Basic Wind Velocity:</strong> {{ calculation.basic_wind_velocity }} m/s</li>
+                                <li class="list-group-item"><strong>Structural Factor:</strong> {{ calculation.structural_factor }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Windward Openings:</strong> {{ calculation.windward_openings }}</li>
+                                <li class="list-group-item"><strong>Leeward Openings:</strong> {{ calculation.leeward_openings }}</li>
+                                <li class="list-group-item"><strong>Parallel Openings:</strong> {{ calculation.parallel_openings }}</li>
+                                <li class="list-group-item"><strong>Internal Pressure Coeff:</strong> {{ calculation.internal_pressure_coeff }}</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 class="mt-4 mb-3">Results <i class="fas fa-info-circle ms-2" data-bs-toggle="modal" data-bs-target="#zoneModal"></i></h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Zone</th>
+                                    <th>Area (m²)</th>
+                                    <th>C_pe</th>
+                                    <th>W_e (kN/m²)</th>
+                                    <th>W_i (kN/m²)</th>
+                                    <th>W_net (kN/m²)</th>
+                                    <th>F_w (kN)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr class="zone-{{ result.zone|lower|cut:' (lower)'|cut:' (upper)' }}">
+                                    <td>{{ result.zone }}</td>
+                                    <td>{{ result.area|floatformat:2 }}</td>
+                                    <td>{{ result.C_pe|floatformat:2 }}</td>
+                                    <td>{{ result.W_e|floatformat:2 }}</td>
+                                    <td>{{ result.W_i|floatformat:2 }}</td>
+                                    <td>{{ result.W_net|floatformat:2 }}</td>
+                                    <td>{{ result.F_w|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <a href="{% url 'calculate' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-plus-circle me-2"></i>New Calculation
+                        </a>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#solutionModal">
+                            <i class="fas fa-book me-2"></i>Solution Detail
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Zone Diagram Modal -->
+<div class="modal fade" id="zoneModal" tabindex="-1" aria-labelledby="zoneModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="zoneModalLabel">Building Zones</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img src="{% static 'images/zone_diagram.png' %}" class="img-fluid" alt="Zone Diagram">
+                <p class="ref">[ES EN 1991-1-4:2015]</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Solution Detail Modal -->
+<div class="modal fade" id="solutionModal" tabindex="-1" aria-labelledby="solutionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="solutionModalLabel">Step-by-Step Solution</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <div class="accordion" id="solutionAccordion">
+                    {% for step in explanation %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button {% if forloop.first %}show{% else %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#step-{{ forloop.counter }}">
+                                {{ step.title|safe }}
+                            </button>
+                        </h2>
+                        <div id="step-{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}">
+                            <div class="accordion-body">
+                                <p><strong>What is this step?</strong> {{ step.description|safe }}</p>
+                                <p><strong>Formula:</strong> \( {{ step.formula }} \)</p>
+                                <p><strong>Values Used:</strong> {{ step.values|safe }}</p>
+                                <p><strong>Result:</strong> {{ step.result|safe }}</p>
+                                <p><strong>Reference:</strong> {{ step.reference }}</p>
+                                {% if step.substeps %}
+                                <h6>Substeps for {{ step.title|safe }}</h6>
+                                <ul>
+                                    {% for substep in step.substeps %}
+                                    <li>
+                                        <strong>{{ substep.title|safe }}:</strong>
+                                        <p>{{ substep.description|safe }}</p>
+                                        <p><strong>Formula:</strong> \( {{ substep.formula }} \)</p>
+                                        <p><strong>Values:</strong> {{ substep.values|safe }}</p>
+                                        <p><strong>Result:</strong> {{ substep.result|safe }}</p>
+                                        <p><strong>Reference:</strong> {{ substep.reference }}</p>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="exportSolutionPDF()">Export as PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

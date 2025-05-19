@@ -1,0 +1,245 @@
+{% extends 'calculator/base.html' %}
+{% load static %}
+{% block content %}
+<div class="py-4">
+    <div class="card shadow-lg border-0 animate__animated animate__fadeIn">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0"><i class="fas fa-table me-2"></i>Wind Load Analysis Results</h2>
+        </div>
+        <div class="card-body">
+            <!-- Tabs for Wall and Roof Load -->
+            <ul class="nav nav-tabs mb-4" id="resultTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" href="{% url 'calculate' %}"><i class="fas fa-wall me-2"></i>Wall Load</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="roof-tab" data-bs-toggle="tab" data-bs-target="#roof" type="button" role="tab" aria-controls="roof" aria-selected="true">
+                        <i class="fas fa-home me-2"></i>Roof Load
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="resultTabContent">
+                <!-- Roof Load Tab -->
+                <div class="tab-pane fade show active" id="roof" role="tabpanel" aria-labelledby="roof-tab">
+                    <h4 class="mb-3">Input Parameters</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Building Length (L):</strong> {{ calculation.building_length }} m</li>
+                                <li class="list-group-item"><strong>Building Width (b):</strong> {{ calculation.building_width }} m</li>
+                                <li class="list-group-item"><strong>Ridge Height (h):</strong> {{ calculation.ridge_height }} m</li>
+                                <li class="list-group-item"><strong>Pitch Angle (α):</strong> {{ calculation.pitch_angle }}°</li>
+                                <li class="list-group-item"><strong>Site Altitude:</strong> {{ calculation.site_altitude }} m</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Terrain Category:</strong> {{ calculation.terrain_category }}</li>
+                                <li class="list-group-item"><strong>Upwind Slope (H/L_u):</strong> {{ calculation.upwind_slope }}</li>
+                                <li class="list-group-item"><strong>Horizontal Distance (x):</strong> {{ calculation.horizontal_distance }} m</li>
+                                <li class="list-group-item"><strong>Effective Height (H):</strong> {{ calculation.effective_height }} m</li>
+                                <li class="list-group-item"><strong>Upwind Slope Length (L_u):</strong> {{ calculation.upwind_slope_length }} m</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Windward Openings Area:</strong> {{ calculation.windward_openings_area }} mm²</li>
+                                <li class="list-group-item"><strong>Leeward Openings Area:</strong> {{ calculation.leeward_openings_area }} mm²</li>
+                                <li class="list-group-item"><strong>Parallel Openings Area:</strong> {{ calculation.parallel_openings_area }} mm²</li>
+                                <li class="list-group-item"><strong>Purlin Spacing:</strong> {{ calculation.purlin_spacing }} m</li>
+                                <li class="list-group-item"><strong>Truss Spacing:</strong> {{ calculation.truss_spacing }} m</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 class="mt-4 mb-3">Results (\(\theta = 0^\circ\))</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Zone</th>
+                                    <th>Area (m²)</th>
+                                    <th>C_pe (+ve)</th>
+                                    <th>C_pe (-ve)</th>
+                                    <th>W_e (+ve, kN/m²)</th>
+                                    <th>W_e (-ve, kN/m²)</th>
+                                    <th>F_w (+ve, kN)</th>
+                                    <th>F_w (-ve, kN)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results_0 %}
+                                <tr class="zone-{{ result.zone|lower }}">
+                                    <td>{{ result.zone }}</td>
+                                    <td>{{ result.area|floatformat:3 }}</td>
+                                    <td>{{ result.C_pe_pos|floatformat:2 }}</td>
+                                    <td>{{ result.C_pe_neg|floatformat:2 }}</td>
+                                    <td>{{ result.W_e_pos|floatformat:4 }}</td>
+                                    <td>{{ result.W_e_neg|floatformat:4 }}</td>
+                                    <td>{{ result.F_w_pos|floatformat:2 }}</td>
+                                    <td>{{ result.F_w_neg|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4 class="mt-4 mb-3">Results (\(\theta = 90^\circ\))</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Zone</th>
+                                    <th>Area (m²)</th>
+                                    <th>C_pe (-ve)</th>
+                                    <th>W_e (-ve, kN/m²)</th>
+                                    <th>F_w (-ve, kN)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results_90 %}
+                                <tr class="zone-{{ result.zone|lower }}">
+                                    <td>{{ result.zone }}</td>
+                                    <td>{{ result.area|floatformat:3 }}</td>
+                                    <td>{{ result.C_pe_neg|floatformat:2 }}</td>
+                                    <td>{{ result.W_e_neg|floatformat:4 }}</td>
+                                    <td>{{ result.F_w_neg|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4 class="mt-4 mb-3">Load Transfer to Purlins (\(\theta = 90^\circ\))</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Zone</th>
+                                    <th>Area (m²)</th>
+                                    <th>W_e (kN/m²)</th>
+                                    <th>F_w Purlin (kN/m)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for load in purlin_loads %}
+                                <tr class="zone-{{ load.zone|lower }}">
+                                    <td>{{ load.zone }}</td>
+                                    <td>{{ load.area|floatformat:3 }}</td>
+                                    <td>{{ load.W_e|floatformat:4 }}</td>
+                                    <td>{{ load.F_w_purlin|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4 class="mt-4 mb-3">Load Transfer to Trusses (\(\theta = 90^\circ\))</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Zone</th>
+                                    <th>Area (m²)</th>
+                                    <th>F_w Purlin (kN/m)</th>
+                                    <th>F_w Truss (kN)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for load in truss_loads %}
+                                <tr class="zone-{{ load.zone|lower }}">
+                                    <td>{{ load.zone }}</td>
+                                    <td>{{ load.area|floatformat:3 }}</td>
+                                    <td>{{ load.F_w_purlin|floatformat:2 }}</td>
+                                    <td>{{ load.F_w_truss|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <a href="{% url 'roof_calculate' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-plus-circle me-2"></i>New Calculation
+                        </a>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#solutionModal">
+                            <i class="fas fa-book me-2"></i>Solution Detail
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Solution Detail Modal -->
+<div class="modal fade" id="solutionModal" tabindex="-1" aria-labelledby="solutionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="solutionModalLabel">Step-by-Step Solution</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <div class="accordion" id="solutionAccordion">
+                    {% for step in explanation %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button {% if forloop.first %}show{% else %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#step-{{ forloop.counter }}">
+                                {{ step.title|safe }}
+                            </button>
+                        </h2>
+                        <div id="step-{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}">
+                            <div class="accordion-body">
+                                <p><strong>What is this step?</strong> {{ step.description|safe }}</p>
+                                <p><strong>Formula:</strong> \( {{ step.formula }} \)</p>
+                                <p><strong>Values Used:</strong> {{ step.values|safe }}</p>
+                                <p><strong>Result:</strong> {{ step.result|safe }}</p>
+                                <p><strong>Reference:</strong> {{ step.reference }}</p>
+                                {% if step.figures %}
+                                <h6>Figures</h6>
+                                {% for figure in step.figures %}
+                                <img src="{{ figure }}" class="img-fluid mb-2" alt="Diagram">
+                                {% endfor %}
+                                {% endif %}
+                                {% if step.substeps %}
+                                <h6>Substeps for {{ step.title|safe }}</h6>
+                                <ul>
+                                    {% for substep in step.substeps %}
+                                    <li>
+                                        <strong>{{ substep.title|safe }}:</strong>
+                                        <p>{{ substep.description|safe }}</p>
+                                        <p><strong>Formula:</strong> \( {{ substep.formula }} \)</p>
+                                        <p><strong>Values:</strong> {{ substep.values|safe }}</p>
+                                        <p><strong>Result:</strong> {{ substep.result|safe }}</p>
+                                        <p><strong>Reference:</strong> {{ substep.reference }}</p>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Force MathJax Re-rendering -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof MathJax !== 'undefined') {
+            MathJax.typesetPromise().then(() => {
+                console.log('MathJax rendering complete');
+            }).catch((err) => console.log('MathJax rendering failed: ', err));
+        }
+    });
+</script>
+{% endblock %}

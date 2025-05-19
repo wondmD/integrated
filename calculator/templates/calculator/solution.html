@@ -1,0 +1,46 @@
+{% extends 'calculator/base.html' %}
+{% block title %}Step-by-Step Solution{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Step-by-Step Solution</h1>
+    <div class="solution-content">
+        {% for step in explanation %}
+            <div class="step">
+                <h2 class="mathjax-content">{{ step.title|safe }}</h2>
+                <p><strong>Description:</strong> <span class="mathjax-content">{{ step.description|safe }}</span></p>
+                <p><strong>Formula:</strong> <span class="mathjax-content">{{ step.formula|safe }}</span></p>
+                {% if step.values %}
+                    <p><strong>Values Used:</strong> <span class="mathjax-content">{{ step.values|safe }}</span></p>
+                {% endif %}
+                {% if step.result %}
+                    <p><strong>Result:</strong> <span class="mathjax-content">{{ step.result|safe }}</span></p>
+                {% endif %}
+                <p><strong>Reference:</strong> {{ step.reference|safe }}</p>
+                {% if step.substeps %}
+                    <h3>Substeps</h3>
+                    {% for substep in step.substeps %}
+                        <div class="substep">
+                            <h4 class="mathjax-content">{{ substep.title|safe }}</h4>
+                            <p><strong>Description:</strong> <span class="mathjax-content">{{ substep.description|safe }}</span></p>
+                            <p><strong>Formula:</strong> <span class="mathjax-content">{{ substep.formula|safe }}</span></p>
+                            {% if substep.values %}
+                                <p><strong>Values Used:</strong> <span class="mathjax-content">{{ substep.values|safe }}</span></p>
+                            {% endif %}
+                            {% if substep.results %}
+                                <p><strong>Results:</strong></p>
+                                <ul>
+                                    {% for result in substep.results %}
+                                        <li class="mathjax-content">{{ result|safe }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            <p><strong>Reference:</strong> {{ substep.reference|safe }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <a href="{% url 'calculate' %}?calculation_id={{ calculation_id }}" class="btn">Back to Results</a>
+</div>
+{% endblock %}
