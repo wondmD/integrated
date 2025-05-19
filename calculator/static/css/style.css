@@ -135,3 +135,11 @@ body {
         padding: 8px 12px;
     }
 }
+
+.accordion-button {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+.accordion-body {
+    padding: 1.5rem;
+}

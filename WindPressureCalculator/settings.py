@@ -40,6 +40,10 @@ INSTALLED_APPS = [
 
     'calculator',
     'roof_calculator',
+    'home',
+    'monopitch',
+    'flatroof',
+    'duopitch',
 ]
 
 MIDDLEWARE = [

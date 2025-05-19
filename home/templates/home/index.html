@@ -1,0 +1,97 @@
+{% extends 'calculator/base.html' %}
+{% load static %}
+{% block content %}
+<div class="py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold animate__animated animate__fadeIn">Wind Load Calculator</h1>
+        <p class="lead text-muted animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+            A powerful tool to calculate wind loads on walls and various roof types based on ES EN 1991-1-4:2015 standards.
+        </p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 mb-4 animate__animated animate__fadeInUp">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>About This Application</h3>
+                </div>
+                <div class="card-body">
+                    <p>
+                        The Wind Load Calculator is designed to assist engineers and architects in determining wind loads
+                        on building structures. It provides accurate calculations for wind pressures and forces, adhering to
+                        the Eurocode standard ES EN 1991-1-4:2015. The application supports two main categories:
+                    </p>
+                    <ul>
+                        <li><strong>Wind Load on Walls:</strong> Calculate wind pressures for vertical building surfaces.</li>
+                        <li><strong>Wind Load on Roofs:</strong> Analyze wind loads for various roof types, including
+                            Duopitch, Monopitch, Hipped, and Flat roofs.</li>
+                    </ul>
+                    <p>
+                        Each calculation provides detailed step-by-step solutions, including formulas, input values, and
+                        references to the Eurocode standard, ensuring transparency and reliability.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card shadow-lg border-0 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-cogs me-2"></i>Available Services</h3>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-3">Wind Load Calculations</h4>
+                    <div class="row">
+                        <!-- Wind Load on Wall -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-wall me-2"></i>Wind Load on a Wall</h5>
+                                    <p class="card-text">
+                                        Calculate wind pressures and forces on vertical walls, ideal for facades and
+                                        external building surfaces.
+                                    </p>
+                                    <a href="{% url 'wall_calculate' %}" class="btn btn-primary">
+                                        <i class="fas fa-calculator me-2"></i>Calculate Now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Wind Load on Roof -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-home me-2"></i>Wind Load on a Roof</h5>
+                                    <p class="card-text">
+                                        Analyze wind loads for various roof configurations. Select a roof type to proceed:
+                                    </p>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <a href="{% url 'duopitch_calculate' %}" class="text-primary text-decoration-none">
+                                                <i class="fas fa-angle-double-up me-2"></i>Duopitch Roof
+                                            </a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <a href="{% url 'monopitch_calculate' %}" class="text-primary text-decoration-none">
+                                                <i class="fas fa-angle-up me-2"></i>Monopitch Roof
+                                            </a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <a href="#" class="text-primary text-decoration-none">
+                                                <i class="fas fa-home me-2"></i>Hipped Roof
+                                            </a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <a href="{% url 'flatroof_calculate' %}" class="text-primary text-decoration-none">
+                                                <i class="fas fa-minus me-2"></i>Flat Roof
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

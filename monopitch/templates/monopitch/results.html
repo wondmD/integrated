@@ -1,0 +1,204 @@
+{% extends 'calculator/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Monopitch Roof Wind Load Calculation Results</h2>
+    <p>Results are calculated per Eurocode 1 (EN 1991-1-4:2005+A1:2010). Negative pressures indicate suction (uplift).</p>
+    
+    <!-- Zone Results Table -->
+    <h3>Zone Results</h3>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Zone</th>
+                <th>Area (m²)</th>
+                <th>C_pe, positive</th>
+                <th>C_pe, negative</th>
+                <th>w_e, positive (kN/m²)</th>
+                <th>w_e, negative (kN/m²)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.zone }}</td>
+                <td>{{ result.area|floatformat:2 }}</td>
+                <td>{{ result.C_pe_pos|floatformat:2|default:"N/A" }}</td>
+                <td>{{ result.C_pe_neg|floatformat:2 }}</td>
+                <td>{{ result.w_e_pos|floatformat:4|default:"N/A" }}</td>
+                <td>{{ result.w_e_neg|floatformat:4 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Purlin Loads Table -->
+    <h3>Purlin Loads</h3>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Zone</th>
+                <th>Area (m²)</th>
+                <th>w_e (kN/m²)</th>
+                <th>F_w,purlin (kN/m)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for load in purlin_loads %}
+            <tr>
+                <td>{{ load.zone }}</td>
+                <td>{{ load.area|floatformat:2 }}</td>
+                <td>{{ load.w_e|floatformat:4 }}</td>
+                <td>{{ load.f_w_purlin|floatformat:4 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Truss Loads Table -->
+    <h3>Truss Loads</h3>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Zone</th>
+                <th>Area (m²)</th>
+                <th>F_w,purlin (kN/m)</th>
+                <th>F_w,truss (kN)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for load in truss_loads %}
+            <tr>
+                <td>{{ load.zone }}</td>
+                <td>{{ load.area|floatformat:2 }}</td>
+                <td>{{ load.f_w_purlin|floatformat:4 }}</td>
+                <td>{{ load.f_w_truss|floatformat:4 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Solution Detail Button -->
+    <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#solutionModal">
+        View Solution Details
+    </button>
+
+    <!-- Solution Detail Modal -->
+    <div class="modal fade" id="solutionModal" tabindex="-1" aria-labelledby="solutionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="solutionModalLabel">Solution Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="accordion" id="solutionAccordion">
+                        {% for step in explanation %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                                <button class="accordion-button {% if forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">
+                                    {{ step.title }}
+                                </button>
+                            </h2>
+                            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#solutionAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Description:</strong> {{ step.description|safe }}</p>
+                                    <p><strong>Formula:</strong> {{ step.formula|safe }}</p>
+                                    <p><strong>Values:</strong> {{ step.values_latex|safe }}</p>
+                                    <p><strong>Result:</strong> {{ step.result_latex|safe }}</p>
+                                    <p><strong>Reference:</strong> {{ step.reference }}</p>
+                                    {% if step.figures %}
+                                    <p><strong>Figures:</strong></p>
+                                    {% for figure in step.figures %}
+                                    <img src="{{ figure }}" alt="Figure" class="img-fluid" style="max-width: 100%;">
+                                    {% endfor %}
+                                    {% endif %}
+                                    {% if step.substeps %}
+                                    <h5>Substeps:</h5>
+                                    <div class="accordion" id="substepAccordion{{ forloop.counter }}">
+                                        {% for substep in step.substeps %}
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="substepHeading{{ forloop.parentloop.counter }}{{ forloop.counter }}">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#substepCollapse{{ forloop.parentloop.counter }}{{ forloop.counter }}" aria-expanded="false" aria-controls="substepCollapse{{ forloop.parentloop.counter }}{{ forloop.counter }}">
+                                                    {{ substep.title }}
+                                                </button>
+                                            </h2>
+                                            <div id="substepCollapse{{ forloop.parentloop.counter }}{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="substepHeading{{ forloop.parentloop.counter }}{{ forloop.counter }}" data-bs-parent="#substepAccordion{{ forloop.counter }}">
+                                                <div class="accordion-body">
+                                                    <p><strong>Description:</strong> {{ substep.description|safe }}</p>
+                                                    <p><strong>Formula:</strong> {{ substep.formula|safe }}</p>
+                                                    <p><strong>Values:</strong> {{ substep.values_latex|safe }}</p>
+                                                    <p><strong>Result:</strong> {{ substep.result_latex|safe }}</p>
+                                                    <p><strong>Reference:</strong> {{ substep.reference }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']] },
+        TeX: { equationNumbers: { autoNumber: "AMS" } },
+        CommonHTML: { scale: 100, linebreaks: { automatic: true } },
+        "HTML-CSS": { availableFonts: ["STIX-Web"], preferredFont: "STIX-Web", linebreaks: { automatic: true } }
+    });
+</script>
+<style>
+    .table {
+        font-size: 0.95rem;
+    }
+    .table-dark {
+        background-color: #343a40;
+    }
+    .MathJax, .MathJax_Display {
+        font-family: 'STIX-Web', 'Times New Roman', serif !important;
+        font-size: 16px !important;
+        color: #333 !important;
+        overflow-wrap: break-word !important;
+        word-break: break-all !important;
+        max-width: 100% !important;
+        white-space: normal !important;
+    }
+    .accordion-button {
+        font-size: 1.1rem;
+        font-weight: 500;
+        background-color: #ffffff;
+    }
+    .accordion-body {
+        padding: 1.5rem;
+        overflow-x: auto;
+        max-width: 100%;
+        overflow-wrap: break-word;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    .modal-xl {
+        max-width: 90%;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+</style>
+{% endblock %}

@@ -394,4 +394,4 @@ def calculate(request):
         }
         form = WindPressureForm(initial=initial_data)
 
-    return render(request, 'calculator/input_form.html', {'form': form})
+    return render(request, 'calculator/wall_input.html', {'form': form})
