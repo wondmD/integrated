@@ -1,0 +1,359 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wind Load Calculation Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white py-6">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-bold">Wind Load Calculation Results</h1>
+            <p class="mt-2">Detailed wind load analysis for a hipped roof</p>
+        </div>
+    </header>
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <!-- Input Summary -->
+        <section class="mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4">Input Parameters</h2>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li>Fundamental basic wind velocity (\( V_{b,0} \)): {{ form.vb0.value }} m/s</li>
+                    <li>Directional factor (\( C_{\text{direction}} \)): {{ form.c_direction.value }}</li>
+                    <li>Season factor (\( C_{\text{season}} \)): {{ form.c_season.value }}</li>
+                    <li>Air density (\( \rho \)): {{ form.rho.value }} kg/m³</li>
+                    <li>Terrain category: {{ form.terrain_category.value }}</li>
+                    <li>Height to eaves (\( h_e \)): {{ form.h_e.value }} m</li>
+                    <li>Height from eaves to ridge (\( h_r \)): {{ form.h_r.value }} m</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Calculation Steps -->
+        <section class="mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4">Calculation Steps</h2>
+                <div class="space-y-6">
+                    <!-- Step 1 -->
+                    <div>
+                        <h3 class="text-xl font-medium">Step 1: Basic Wind Velocity (\( V_b \))</h3>
+                        <p class="mt-2">Formula: \( V_b = C_{\text{direction}} \times C_{\text{season}} \times V_{b,0} \)</p>
+                        <p>Calculation: \( V_b = {{ form.c_direction.value }} \times {{ form.c_season.value }} \times {{ form.vb0.value }} = {{ V_b }} \, \text{m/s} \)</p>
+                        <p class="text-gray-600">This step calculates the effective wind speed considering directional and seasonal effects.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div>
+                        <h3 class="text-xl font-medium">Step 2: Basic Velocity Pressure (\( q_b \))</h3>
+                        <p class="mt-2">Formula: \( q_b = \frac{1}{2} \rho V_b^2 \)</p>
+                        <p>Calculation: \( q_b = 0.5 \times {{ form.rho.value }} \times {{ V_b|floatformat:2 }}^2 = {{ q_b|floatformat:2 }} \, \text{N/m}^2 \)</p>
+                        <p class="text-gray-600">Converts wind speed to pressure using air density.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div>
+                        <h3 class="text-xl font-medium">Step 3: Reference Height (\( z \))</h3>
+                        <p>Formula: \( z = h_e + h_r \)</p>
+                        <p>Calculation: \( z = {{ form.h_e.value }} + {{ form.h_r.value }} = {{ z|floatformat:2 }} \, \text{m} \)</p>
+                        <p class="text-gray-600">The height to the roof ridge, used for wind calculations.</p>
+                    </div>
+                    <!-- Step 4 -->
+                    <div>
+                        <h3 class="text-xl font-medium">Step 4: Roughness Length (\( z_0 \))</h3>
+                        <p>Based on terrain category {{ form.terrain_category.value }}, \( z_0 = {{ z0|floatformat:3 }} \, \text{m} \)</p>
+                        <p class="text-gray-600">Determined by terrain type, affecting wind turbulence.</p>
+                    </div>
+                    <!-- Step 5 -->
+                    <div>
+                        <h3 class="text-xl font-medium">Step 5: Turbulence Intensity (\( I_v(z) \))</h3>
+                        <p>Formula: \( I_v(z) = \frac{1}{\ln(z / z_0)} \)</p>
+                        <p>Calculation: \( I_v(z) = \frac{1}{\ln({{ z|floatformat:2 }} / {{ z0|floatformat:3 }}) = {{ I_v|floatformat:3 }} \)</p>
+                        <p class="text-gray-600">Measures wind turbulence at the reference height.</p>
+                    </div>
+                    <!-- Step 6 -->
+                    <div>
+                        <h3 class="text-xl font-medium">Step 6: Roughness Factor (\( c_r(z) \))</h3>
+                        <p>Formula: \( c_r(z) = k_r \times \ln(z / z_0) \), where \( k_r = 0.2154 \)</p>
+                        <p>Calculation: \( c_r(z) = 0.2154 \times \ln({{ z|floatformat:2 }} / {{ z0|floatformat:3 }}) = {{ c_r|floatformat:3 }} \)</p>
+                        <p class="text-gray-600">Adjusts wind speed based on terrain roughness.</p>
+                    </div>
+                    <!-- Step 7 -->
+                    <div>
+                        <h3 class="text-xl font-medium">Step 7: Mean Wind Velocity (\( V_m(z) \))</h3>
+                        <p>Formula: \( V_m(z) = c_r(z) \times c_0(z) \times V_b \), where \( c_0(z) = 1.0 \) (flat terrain)</p>
+                        <p>Calculation: \( V_m(z) = {{ c_r|floatformat:3 }} \times 1.0 \times {{ V_b|floatformat:2 }} = {{ V_m|floatformat:2 }} \, \text{m/s} \)</p>
+                        <p class="text-gray-600">Wind speed at height \( z \), adjusted for terrain effects.</p>
+                    </div>
+                    <!-- Step 8 -->
+                    <div>
+                        <h3 class="text-xl font-medium">Step 8: Peak Velocity Pressure (\( q_p(z) \))</h3>
+                        <p>Formula: \( q_p(z) = [1 + 7 \times I_v(z)] \times \frac{1}{2} \rho V_m^2(z) \)</p>
+                        <p>Calculation: \( q_p(z) = [1 + 7 \times {{ I_v|floatformat:3 }}] \times 0.5 \times {{ form.rho.value }} \times {{ V_m|floatformat:2 }}^2 = {{ q_p|floatformat:4 }} \, \text{kN/m}^2 \)</p>
+                        <p class="text-gray-600">Accounts for turbulence in maximum wind pressure.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Zones Table -->
+        <section class="mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4">External Pressure Coefficients (\( C_{pe} \))</h2>
+                <p class="mb-4">The following table lists the external pressure coefficients for each roof zone, based on wind direction \( \theta = 0^\circ \).</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto border-collapse">
+                        <thead>
+                            <tr class="bg-blue-100">
+                                <th class="px-4 py-2 border">Zone</th>
+                                <th class="px-4 py-2 border">Width (m)</th>
+                                <th class="px-4 py-2 border">Height (m)</th>
+                                <th class="px-4 py-2 border">Area (m²)</th>
+                                <th class="px-4 py-2 border">\( C_{pe} \) (Suction)</th>
+                                <th class="px-4 py-2 border">\( C_{pe} \) (Pressure)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for zone in zones %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-2 border">{{ zone.name }}</td>
+                                <td class="px-4 py-2 border">{{ zone.width|floatformat:2 }}</td>
+                                <td class="px-4 py-2 border">{{ zone.height|floatformat:2 }}</td>
+                                <td class="px-4 py-2 border">{{ zone.area|floatformat:2 }}</td>
+                                <td class="px-4 py-2 border">{{ zone.C_pe_suction|floatformat:4 }}</td>
+                                <td class="px-4 py-2 border">{{ zone.C_pe_pressure|default:"N/A"|floatformat:4 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Net Wind Pressure Table -->
+        <section class="mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4">Net Wind Pressures (\( W_{net} \))</h2>
+                <p class="mb-4">The net wind pressure is calculated as \( W_{net} = C_s C_d \times q_p(z) \times [C_{pe} + C_{pi}] \), where \( C_s C_d = 1.0 \).</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto border-collapse">
+                        <thead>
+                            <tr class="bg-blue-100">
+                                <th class="px-4 py-2 border">Zone</th>
+                                <th class="px-4 py-2 border">\( C_{pe} \)</th>
+                                <th class="px-4 py-2 border">\( C_{pi} \)</th>
+                                <th class="px-4 py-2 border">\( W_{net} \) (kN/m²)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in W_net_results %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-2 border">{{ result.zone }}</td>
+                                <td class="px-4 py-2 border">{{ result.C_pe|floatformat:4 }}</td>
+                                <td class="px-4 py-2 border">{{ result.C_pi|floatformat:2 }}</td>
+                                <td class="px-4 py-2 border">{{ result.W_net|floatformat:4 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Maximum Pressures -->
+        <section class="mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4">Maximum Net Wind Pressures</h2>
+                <p>Maximum positive \( W_{net} \): {{ max_positive_W_net|floatformat:4 }} kN/m²</p>
+                <p>Maximum negative \( W_{net} \): {{ max_negative_W_net|floatformat:4 }} kN/m²</p>
+                <p class="text-gray-600 mt-2">These values represent the most critical suction and pressure loads on the roof.</p>
+            </div>
+        </section>
+
+        <!-- Back to Form -->
+        <div class="text-center">
+            <a href="{% url 'wind_load_analysis_on_hipped_roof' %}" class="inline-block bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">
+                Back to Calculator
+            </a>
+        </div>
+    </main>
+    <footer class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 Wind Load Analysis App. Built for educational purposes.</p>
+        </div>
+    </footer>
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wind Load Calculation Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Wind Load Analysis Results</h1>
+        <p class="text-center mb-4">Detailed wind load analysis for a hipped roof per ES EN 1991-1-4:2015</p>
+
+        <!-- Input Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5">Input Parameters</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Fundamental basic wind velocity (\( V_{b,0} \)): {{ form.vb0.value }} m/s</li>
+                    <li class="list-group-item">Directional factor (\( C_{\text{direction}} \)): {{ form.c_direction.value }}</li>
+                    <li class="list-group-item">Season factor (\( C_{\text{season}} \)): {{ form.c_season.value }}</li>
+                    <li class="list-group-item">Air density (\( \rho \)): {{ form.rho.value }} kg/m³</li>
+                    <li class="list-group-item">Terrain category: {{ form.terrain_category.value }}</li>
+                    <li class="list-group-item">Height to eaves (\( h_e \)): {{ form.h_e.value }} m</li>
+                    <li class="list-group-item">Height from eaves to ridge (\( h_r \)): {{ form.h_r.value }} m</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- External Pressure Coefficients Table -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5">External Pressure Coefficients (\( C_{pe} \))</h2>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">The following table lists the external pressure coefficients for each roof zone, based on wind direction \( \theta = 0^\circ \).</p>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Zone</th>
+                                <th>Width (m)</th>
+                                <th>Height (m)</th>
+                                <th>Area (m²)</th>
+                                <th>\( C_{pe} \) (Suction)</th>
+                                <th>\( C_{pe} \) (Pressure)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for zone in zones %}
+                            <tr>
+                                <td>{{ zone.name }}</td>
+                                <td>{{ zone.width|floatformat:2 }}</td>
+                                <td>{{ zone.height|floatformat:2 }}</td>
+                                <td>{{ zone.area|floatformat:2 }}</td>
+                                <td>{{ zone.C_pe_suction|floatformat:4 }}</td>
+                                <td>{{ zone.C_pe_pressure|default:"N/A"|floatformat:4 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Net Wind Pressures Table -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5">Net Wind Pressures (\( W_{net} \))</h2>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">The net wind pressure is calculated as \( W_{net} = C_s C_d \times q_p(z) \times [C_{pe} + C_{pi}] \), where \( C_s C_d = 1.0 \).</p>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Zone</th>
+                                <th>Type</th>
+                                <th>\( C_{pe} \)</th>
+                                <th>\( C_{pi} \)</th>
+                                <th>\( W_{net} \) (kN/m²)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in W_net_results %}
+                            <tr>
+                                <td>{{ result.zone }}</td>
+                                <td>{{ result.type|capfirst }}</td>
+                                <td>{{ result.C_pe|floatformat:4 }}</td>
+                                <td>{{ result.C_pi|floatformat:2 }}</td>
+                                <td>{{ result.W_net|floatformat:4 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maximum Pressures -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5">Maximum Net Wind Pressures</h2>
+            </div>
+            <div class="card-body">
+                <p>Maximum positive \( W_{net} \): {{ max_positive_W_net|floatformat:4 }} kN/m²</p>
+                <p>Maximum negative \( W_{net} \): {{ min_negative_W_net|floatformat:4 }} kN/m²</p>
+                <p class="text-muted">These values represent the most critical suction and pressure loads on the roof. Note: The document reports a maximum positive \( W_{net} = 0.922 \, \text{kN/m}^2 \), which may differ from calculations due to possible discrepancies in \( C_{pe} \) values.</p>
+            </div>
+        </div>
+
+        <!-- View Details Button -->
+        <div class="text-center mb-4">
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#detailsCollapse" aria-expanded="false" aria-controls="detailsCollapse">
+                View Details
+            </button>
+        </div>
+
+        <!-- Collapsible Calculation Steps -->
+        <div class="collapse" id="detailsCollapse">
+            <div class="card card-body">
+                <h2 class="h5 mb-4">Calculation Steps</h2>
+                {% for step in steps %}
+                <div class="accordion" id="accordionStep{{ forloop.counter }}">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingStep{{ forloop.counter }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep{{ forloop.counter }}" aria-expanded="false" aria-controls="collapseStep{{ forloop.counter }}">
+                                {{ step.title }}
+                            </button>
+                        </h2>
+                        <div id="collapseStep{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="headingStep{{ forloop.counter }}" data-bs-parent="#accordionStep{{ forloop.counter }}">
+                            <div class="accordion-body">
+                                {% if step.formula %}
+                                <p><strong>Formula:</strong> \( {{ step.formula }} \)</p>
+                                {% endif %}
+                                <p><strong>Explanation:</strong> {{ step.explanation }}</p>
+                                {% if step.calculation %}
+                                <p><strong>Calculation:</strong> {{ step.calculation }}</p>
+                                {% endif %}
+                                <p><strong>Result:</strong> {{ step.result }}</p>
+                                <p><strong>Constants:</strong>
+                                    {% if step.constants %}
+                                    <ul class="list-group list-group-flush">
+                                        {% for key, value in step.constants.items %}
+                                        <li class="list-group-item">\( {{ key }} \): {{ value }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    None
+                                    {% endif %}
+                                </p>
+                                <p><strong>Detailed Explanation:</strong> {{ step.detailed_explanation }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Back to Form -->
+        <div class="text-center mt-4 mb-5">
+            <a href="{% url 'wind_load_analysis_on_hipped_roof' %}" class="btn btn-secondary">Back to Calculator</a>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

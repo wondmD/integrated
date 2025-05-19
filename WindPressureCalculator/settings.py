@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'calculator',
     'roof_calculator',
+    'Wind_load_analysis_on_hipped_roof'
 ]
 
 MIDDLEWARE = [
