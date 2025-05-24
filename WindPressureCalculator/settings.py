@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'calculator',
-    'roof_calculator',
+    
     'home',
     'monopitch',
     'flatroof',

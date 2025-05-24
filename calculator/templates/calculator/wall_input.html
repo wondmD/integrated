@@ -5,7 +5,7 @@
 <div class="container mt-5">
     <h2>Wall Wind Load Calculator</h2>
     <p>Calculate wind pressure loads on vertical walls per ES EN 1991-1-4:2015, Section 7.2.1. Enter the parameters below and click the info icon for details on each input.</p>
-    <form method="post" action="{% url 'wall_calculate' %}">
+    <form method="post" action="{% url 'calculate' %}">
         {% csrf_token %}
         <div class="row">
             {% for field in form %}
@@ -48,7 +48,7 @@
     .form-label {
         font-weight: 500;
         color: #333;
-        flex-grow: 1;
+        /* flex-grow: 1; */
     }
     .info-icon {
         font-size: 1rem;

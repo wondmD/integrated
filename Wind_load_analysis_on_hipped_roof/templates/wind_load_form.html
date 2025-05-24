@@ -1,36 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wind Load Calculator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-</head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
-    <header class="bg-blue-600 text-white py-6">
-        <div class="container mx-auto px-4">
-            <h1 class="text-3xl font-bold">Wind Load Analysis Calculator</h1>
-            <p class="mt-2">Calculate wind loads on a hipped roof per ES EN 1991-1-4:2015</p>
+{% extends 'calculator/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Hipped Roof Wind Load Calculator</h2>
+    <p>Calculate wind pressure loads on hipped roofs per ES EN 1991-1-4:2015, Section 7.2.5. Enter the parameters below and click the info icon for details on each input.</p>
+    <form method="post" action="{% url 'wind_load_analysis_on_hipped_roof' %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in form %}
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <label class="form-label me-2" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <i class="bi bi-info-circle info-icon" data-bs-toggle="collapse" data-bs-target="#collapse{{ field.name }}" aria-expanded="false" aria-controls="collapse{{ field.name }}"></i>
+                </div>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger">{{ field.errors }}</div>
+                {% endif %}
+                <div class="accordion mt-2" id="accordion{{ field.name }}">
+                    <div class="accordion-item">
+                        <div id="collapse{{ field.name }}" class="accordion-collapse collapse" aria-labelledby="heading{{ field.name }}" data-bs-parent="#accordion{{ field.name }}">
+                            <div class="accordion-body">
+                                {{ field.help_text|safe }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-    </header>
-    <main class="container mx-auto px-4 py-8 flex-grow">
-        <div class="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
-            <h2 class="text-2xl font-semibold mb-4">Input Parameters</h2>
-            <form method="post" class="space-y-4">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">
-                    Calculate Wind Loads
-                </button>
-            </form>
-        </div>
-    </main>
-    <footer class="bg-gray-800 text-white py-4">
-        <div class="container mx-auto px-4 text-center">
-            <p>&copy; 2025 Wind Load Analysis App. Built for educational purposes.</p>
-        </div>
-    </footer>
-</body>
-</html>
+        <button type="submit" class="btn btn-primary mt-3">Calculate</button>
+    </form>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<script>
+    document.querySelectorAll('.info-icon').forEach(icon => {
+        icon.addEventListener('click', function() {
+            const target = document.querySelector(this.getAttribute('data-bs-target'));
+            const collapse = bootstrap.Collapse.getOrCreateInstance(target);
+            collapse.toggle();
+        });
+    });
+</script>
+<style>
+    .form-label {
+        font-weight: 500;
+        color: #333;
+        /* flex-grow: 1; */
+    }
+    .info-icon {
+        font-size: 1rem;
+        color: #17a2b8;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .info-icon:hover {
+        color: #138496;
+    }
+    .accordion-body {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
+    .accordion-item {
+        border: none;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+</style>
+{% endblock %}
