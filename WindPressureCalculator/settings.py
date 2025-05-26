@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'flatroof',
     'duopitch',
     'Wind_load_analysis_on_hipped_roof'
+    # 'widget_tweaks'
 ]
 
 MIDDLEWARE = [

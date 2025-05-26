@@ -1,0 +1,95 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{noto}
+
+\geometry{margin=1in}
+
+\begin{document}
+
+% Setting up the title
+\title{Wind Load Analysis on Hipped Roof}
+\author{Wind Load Analysis App}
+\date{May 25, 2025}
+\maketitle
+
+% Input Parameters Section
+\section{Input Parameters}
+\begin{itemize}
+    \item Fundamental Basic Wind Velocity ($V_{b,0}$): {{ calculation.vb0 }} m/s
+    \item Directional Factor ($C_{\text{direction}}$): {{ calculation.c_direction }}
+    \item Seasonal Factor ($C_{\text{season}}$): {{ calculation.c_season }}
+    \item Air Density ($\rho$): {{ calculation.rho }} kg/m$^3$
+    \item Terrain Category: {{ calculation.terrain_category }}
+    \item Height to Eaves ($h_e$): {{ calculation.h_e }} m
+    \item Height from Eaves to Ridge ($h_r$): {{ calculation.h_r }} m
+\end{itemize}
+
+% Calculation Steps Section
+\section{Calculation Steps}
+{% for step in steps %}
+\subsection{{ step.title }}
+\textbf{Formula:} 
+\begin{equation}
+{% if step.formula %}{{ step.formula }}{% else %}N/A{% endif %}
+\end{equation}
+\textbf{Explanation:} {{ step.explanation }}
+
+\textbf{Calculation:} {{ step.calculation }}
+
+\textbf{Result:} {{ step.result }}
+
+\textbf{Constants:}
+\begin{itemize}
+    {% for key, value in step.constants.items %}
+    \item ${{ key }}$: {{ value }}
+    {% endfor %}
+\end{itemize}
+
+\textbf{Detailed Explanation:} {{ step.detailed_explanation }}
+{% endfor %}
+
+% External Pressure Coefficients Table
+\section{External Pressure Coefficients}
+\begin{table}[h]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Zone & Width (m) & Height (m) & Area (m$^2$) & $C_{pe}$ (Suction) & $C_{pe}$ (Pressure) \\
+\midrule
+{% for zone in zones %}
+{{ zone.name }} & {{ zone.width|floatformat:2 }} & {{ zone.height|floatformat:2 }} & {{ zone.area|floatformat:2 }} & {{ zone.C_pe_suction|floatformat:3 }} & {% if zone.C_pe_pressure %}{{ zone.C_pe_pressure|floatformat:3 }}{% else %}N/A{% endif %} \\
+{% endfor %}
+\bottomrule
+\end{tabular}
+\caption{External Pressure Coefficients}
+\end{table}
+
+% Net Wind Pressures Table
+\section{Net Wind Pressures}
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Zone & Type & $C_{pe}$ & $C_{pi}$ & $W_{net}$ (kN/m$^2$) \\
+\midrule
+{% for result in W_net_results %}
+{{ result.zone }} & {{ result.type }} & {{ result.C_pe|floatformat:3 }} & {{ result.C_pi|floatformat:3 }} & {{ result.W_net|floatformat:3 }} \\
+{% endfor %}
+\bottomrule
+\end{tabular}
+\caption{Net Wind Pressures}
+\end{table}
+
+% Maximum Net Wind Pressures
+\section{Maximum Net Wind Pressures}
+\begin{itemize}
+    \item Maximum Positive $W_{net}$: {{ max_positive_W_net|floatformat:3 }} kN/m$^2$
+    \item Maximum Negative $W_{net}$: {{ min_negative_W_net|floatformat:3 }} kN/m$^2$
+\end{itemize}
+
+\end{document}
