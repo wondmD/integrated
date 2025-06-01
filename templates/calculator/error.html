@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Error - Wind Load Calculator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <h5 class="alert-heading">An error occurred during calculation</h5>
+                    <p>{{ error_message }}</p>
+                </div>
+
+                {% if form_errors %}
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Validation Errors</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            {% for field, errors in form_errors.items %}
+                            <li class="list-group-item">
+                                <strong>{{ field }}:</strong>
+                                <ul class="mb-0">
+                                    {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="text-center mt-4">
+                    <a href="{% url 'calculator:calculate' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Calculator
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

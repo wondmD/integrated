@@ -3,7 +3,7 @@ from .forms import MonopitchRoofForm
 import math
 from django.templatetags.static import static
 
-def monopitch_calculate(request):
+def wind_load_analysis_on_monopitch_roof(request):
     if request.method == 'POST':
         form = MonopitchRoofForm(request.POST)
         if form.is_valid():

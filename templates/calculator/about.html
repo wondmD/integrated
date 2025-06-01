@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}About - Wind Load Calculator{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Introduction -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="display-4 mb-4">About the Wind Load Calculator</h1>
+            <p class="lead">
+                The Wind Load Calculator is a comprehensive tool designed to help structural engineers,
+                architects, and building designers calculate wind loads on buildings according to
+                international standards.
+            </p>
+        </div>
+    </div>
+
+    <!-- Methodology -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4">Methodology</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Calculation Process</h5>
+                    <p class="card-text">
+                        The calculator follows a systematic approach to determine wind loads on buildings:
+                    </p>
+                    <ol class="list-group list-group-numbered mb-4">
+                        <li class="list-group-item">
+                            <strong>Basic Wind Velocity</strong>
+                            <p class="mb-0">
+                                Calculate the basic wind velocity considering directional and seasonal factors.
+                            </p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Terrain Parameters</strong>
+                            <p class="mb-0">
+                                Determine terrain parameters based on the surrounding environment.
+                            </p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Reference Height</strong>
+                            <p class="mb-0">
+                                Calculate the reference height based on building dimensions.
+                            </p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Exposure Factor</strong>
+                            <p class="mb-0">
+                                Compute the exposure factor considering terrain roughness and height.
+                            </p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Peak Velocity Pressure</strong>
+                            <p class="mb-0">
+                                Calculate the peak velocity pressure using the basic velocity pressure
+                                and exposure factor.
+                            </p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Pressure Coefficients</strong>
+                            <p class="mb-0">
+                                Determine pressure coefficients for different building zones.
+                            </p>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Net Pressure</strong>
+                            <p class="mb-0">
+                                Calculate the net pressure on each zone considering internal and
+                                external pressures.
+                            </p>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Standards -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4">Supported Standards</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Eurocode 1</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">EN 1991-1-4</h6>
+                            <p class="card-text">
+                                Actions on structures - Part 1-4: General actions - Wind actions.
+                                Provides guidance for calculating wind loads on buildings in Europe.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">ASCE 7</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Minimum Design Loads</h6>
+                            <p class="card-text">
+                                Minimum Design Loads and Associated Criteria for Buildings and Other Structures.
+                                Standard for wind load calculations in the United States.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">AS/NZS 1170.2</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Wind Actions</h6>
+                            <p class="card-text">
+                                Structural design actions - Wind actions.
+                                Standard for wind load calculations in Australia and New Zealand.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assumptions and Limitations -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4">Assumptions and Limitations</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Key Assumptions</h5>
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item">
+                            The building is assumed to be rigid and not subject to dynamic effects.
+                        </li>
+                        <li class="list-group-item">
+                            Wind flow is assumed to be steady and uniform.
+                        </li>
+                        <li class="list-group-item">
+                            Terrain is assumed to be homogeneous upwind of the building.
+                        </li>
+                        <li class="list-group-item">
+                            Internal pressure is assumed to be uniform throughout the building.
+                        </li>
+                    </ul>
+
+                    <h5 class="card-title">Limitations</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            The calculator is not suitable for buildings with complex geometries
+                            or significant dynamic effects.
+                        </li>
+                        <li class="list-group-item">
+                            Local wind effects such as funnelling or channeling are not considered.
+                        </li>
+                        <li class="list-group-item">
+                            The calculator does not account for wind-induced vibrations or aeroelastic effects.
+                        </li>
+                        <li class="list-group-item">
+                            Results should be verified by a qualified structural engineer.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2 class="mb-4">Need Help?</h2>
+            <p class="lead mb-4">
+                If you have any questions or need assistance with the calculator,
+                please don't hesitate to contact us.
+            </p>
+            <a href="mailto:support@windloadcalculator.com" class="btn btn-primary btn-lg">
+                <i class="fas fa-envelope me-2"></i>Contact Support
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

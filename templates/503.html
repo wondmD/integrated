@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Service Unavailable - Wind Load Calculator{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="error-page">
+                <h1 class="display-1 text-muted">503</h1>
+                <h2 class="mb-4">Service Unavailable</h2>
+                <p class="lead mb-4">
+                    The service is temporarily unavailable due to maintenance or high load.
+                    Please try again later.
+                </p>
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    We are working to restore the service as quickly as possible.
+                    Thank you for your patience.
+                </div>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'calculator:home' %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Go to Home
+                    </a>
+                    <a href="mailto:support@windloadcalculator.com" class="btn btn-outline-primary">
+                        <i class="fas fa-envelope me-2"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

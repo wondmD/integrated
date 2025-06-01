@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Length Required - Wind Load Calculator{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="error-page">
+                <h1 class="display-1 text-muted">411</h1>
+                <h2 class="mb-4">Length Required</h2>
+                <p class="lead mb-4">
+                    The server requires a Content-Length header to be specified in the request.
+                </p>
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    This error occurs when the server needs to know the size of the request body,
+                    but the Content-Length header is missing. Please try again or contact support
+                    if the issue persists.
+                </div>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'calculator:home' %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Go to Home
+                    </a>
+                    <a href="mailto:support@windloadcalculator.com" class="btn btn-outline-primary">
+                        <i class="fas fa-envelope me-2"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

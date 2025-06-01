@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Wind Load Calculator - Home{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h1 class="display-4 mb-4">Wind Load Calculator</h1>
+            <p class="lead">
+                A comprehensive tool for calculating wind loads on buildings according to international standards.
+                Get accurate results with detailed step-by-step calculations and explanations.
+            </p>
+            <a href="{% url 'calculator:calculate' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-calculator me-2"></i>Start Calculating
+            </a>
+        </div>
+        <div class="col-md-6">
+            <img src="{% static 'calculator/images/wind-load-illustration.svg' %}" 
+                 alt="Wind Load Illustration" 
+                 class="img-fluid">
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2>Key Features</h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-calculator fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Accurate Calculations</h5>
+                    <p class="card-text">
+                        Perform precise wind load calculations based on international standards
+                        and building codes.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Detailed Reports</h5>
+                    <p class="card-text">
+                        Get comprehensive reports with step-by-step calculations,
+                        formulas, and references.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Responsive Design</h5>
+                    <p class="card-text">
+                        Access the calculator from any device with our responsive
+                        and user-friendly interface.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2>How It Works</h2>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary mb-3">1</div>
+                    <h5 class="card-title">Enter Parameters</h5>
+                    <p class="card-text">
+                        Input building dimensions, site parameters, and other required data.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary mb-3">2</div>
+                    <h5 class="card-title">Calculate</h5>
+                    <p class="card-text">
+                        Our system performs all necessary calculations automatically.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary mb-3">3</div>
+                    <h5 class="card-title">Review Results</h5>
+                    <p class="card-text">
+                        View detailed results with step-by-step calculations.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary mb-3">4</div>
+                    <h5 class="card-title">Export</h5>
+                    <p class="card-text">
+                        Download or print your calculation results for documentation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Standards Section -->
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h2>Supported Standards</h2>
+        </div>
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-3"></i>
+                            Eurocode 1: Actions on structures - Part 1-4: General actions - Wind actions
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-3"></i>
+                            ASCE 7: Minimum Design Loads and Associated Criteria for Buildings and Other Structures
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-3"></i>
+                            AS/NZS 1170.2: Structural design actions - Wind actions
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

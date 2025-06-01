@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}Wind Load Calculator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Wind Load Calculator</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" id="windLoadForm" onsubmit="return validateForm(this);">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <!-- Building Dimensions -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_height" class="form-label">
+                                Building Height (m)
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Total height of the building from ground level"></i>
+                            </label>
+                            {{ form.height }}
+                            {% if form.height.errors %}
+                                <div class="invalid-feedback">{{ form.height.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_in_wind_depth" class="form-label">
+                                In-wind Depth (m)
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Depth of the building in the direction of wind"></i>
+                            </label>
+                            {{ form.in_wind_depth }}
+                            {% if form.in_wind_depth.errors %}
+                                <div class="invalid-feedback">{{ form.in_wind_depth.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_width" class="form-label">
+                                Building Width (m)
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Width of the building perpendicular to wind direction"></i>
+                            </label>
+                            {{ form.width }}
+                            {% if form.width.errors %}
+                                <div class="invalid-feedback">{{ form.width.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Site Parameters -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_site_altitude" class="form-label">
+                                Site Altitude (m)
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Altitude of the building site above sea level"></i>
+                            </label>
+                            {{ form.site_altitude }}
+                            {% if form.site_altitude.errors %}
+                                <div class="invalid-feedback">{{ form.site_altitude.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_terrain_category" class="form-label">
+                                Terrain Category
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Category of terrain surrounding the building (1-4)"></i>
+                            </label>
+                            {{ form.terrain_category }}
+                            {% if form.terrain_category.errors %}
+                                <div class="invalid-feedback">{{ form.terrain_category.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_upwind_slope" class="form-label">
+                                Upwind Slope
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Slope of the terrain upwind of the building"></i>
+                            </label>
+                            {{ form.upwind_slope }}
+                            {% if form.upwind_slope.errors %}
+                                <div class="invalid-feedback">{{ form.upwind_slope.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_orographic_factor" class="form-label">
+                                Orographic Factor
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Factor accounting for local topography effects"></i>
+                            </label>
+                            {{ form.orographic_factor }}
+                            {% if form.orographic_factor.errors %}
+                                <div class="invalid-feedback">{{ form.orographic_factor.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Structural Parameters -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_structural_factor" class="form-label">
+                                Structural Factor
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Factor accounting for structural response"></i>
+                            </label>
+                            {{ form.structural_factor }}
+                            {% if form.structural_factor.errors %}
+                                <div class="invalid-feedback">{{ form.structural_factor.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Opening Parameters -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_windward_openings" class="form-label">
+                                Windward Openings
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Number of openings on windward face"></i>
+                            </label>
+                            {{ form.windward_openings }}
+                            {% if form.windward_openings.errors %}
+                                <div class="invalid-feedback">{{ form.windward_openings.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_leeward_openings" class="form-label">
+                                Leeward Openings
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Number of openings on leeward face"></i>
+                            </label>
+                            {{ form.leeward_openings }}
+                            {% if form.leeward_openings.errors %}
+                                <div class="invalid-feedback">{{ form.leeward_openings.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_parallel_openings" class="form-label">
+                                Parallel Openings
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Number of openings on parallel faces"></i>
+                            </label>
+                            {{ form.parallel_openings }}
+                            {% if form.parallel_openings.errors %}
+                                <div class="invalid-feedback">{{ form.parallel_openings.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Area Parameters -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_windward_area" class="form-label">
+                                Windward Area (mm²)
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Total area of windward openings"></i>
+                            </label>
+                            {{ form.windward_area }}
+                            {% if form.windward_area.errors %}
+                                <div class="invalid-feedback">{{ form.windward_area.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_leeward_area" class="form-label">
+                                Leeward Area (mm²)
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Total area of leeward openings"></i>
+                            </label>
+                            {{ form.leeward_area }}
+                            {% if form.leeward_area.errors %}
+                                <div class="invalid-feedback">{{ form.leeward_area.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_parallel_area" class="form-label">
+                                Parallel Area (mm²)
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Total area of parallel openings"></i>
+                            </label>
+                            {{ form.parallel_area }}
+                            {% if form.parallel_area.errors %}
+                                <div class="invalid-feedback">{{ form.parallel_area.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Pressure Parameters -->
+                        <div class="col-md-6 mb-3">
+                            <label for="id_internal_pressure_coeff" class="form-label">
+                                Internal Pressure Coefficient
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Coefficient for internal pressure calculation"></i>
+                            </label>
+                            {{ form.internal_pressure_coeff }}
+                            {% if form.internal_pressure_coeff.errors %}
+                                <div class="invalid-feedback">{{ form.internal_pressure_coeff.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_basic_wind_velocity" class="form-label">
+                                Basic Wind Velocity (m/s)
+                                <i class="fas fa-info-circle" data-bs-toggle="tooltip" 
+                                   title="Basic wind velocity at the site"></i>
+                            </label>
+                            {{ form.basic_wind_velocity }}
+                            {% if form.basic_wind_velocity.errors %}
+                                <div class="invalid-feedback">{{ form.basic_wind_velocity.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-calculator me-2"></i>Calculate
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // Form validation
+    function validateForm(form) {
+        let isValid = true;
+        const inputs = form.querySelectorAll('input[required]');
+        
+        inputs.forEach(input => {
+            if (!input.value) {
+                isValid = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+        
+        if (isValid) {
+            showLoading();
+        }
+        
+        return isValid;
+    }
+
+    // Show loading indicator
+    function showLoading() {
+        document.querySelector('.loading').style.display = 'block';
+    }
+</script>
+{% endblock %} 

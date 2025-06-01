@@ -1,162 +1,569 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Hipped Roof Wind Load Results{% endblock %}
+{% block title %}Wind Load Analysis on Hipped Roof - Results{% endblock %}
 
 {% block content %}
-<div id="wind-load-results" class="card shadow-sm p-4">
-    <h1 class="mb-4">Wind Load Analysis Results</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Overview/Summary -->
+        <div class="alert alert-primary shadow-sm mb-4">
+            <h4 class="mb-2"><i class="fas fa-info-circle me-2"></i>Wind Load Analysis on Hipped Roof</h4>
+            <p>
+                This tool calculates wind loads on a <strong>hipped roof</strong> structure according to international standards (EN 1991-1-4).<br>
+                <strong>Inputs</strong> are based on your building and site parameters. <strong>Outputs</strong> include wind pressures and coefficients for safe structural design.<br>
+                <span class="text-muted">Use the <b>Help</b> section for definitions, guidance, and example calculations.</span>
+            </p>
+        </div>
 
-    <!-- Input Parameters Section -->
-    <div id="input-parameters">
-        <h2>Input Parameters</h2>
-        <table class="table table-striped">
-            <tr>
-                <th>Parameter</th>
-                <th>Value</th>
-            </tr>
-            <tr>
-                <td>Fundamental Basic Wind Velocity (\(V_{b,0}\)) [m/s]</td>
-                <td>{{ calculation.vb0 }}</td>
-            </tr>
-            <tr>
-                <td>Directional Factor (\(C_{\text{direction}}\))</td>
-                <td>{{ calculation.c_direction }}</td>
-            </tr>
-            <tr>
-                <td>Seasonal Factor (\(C_{\text{season}}\))</td>
-                <td>{{ calculation.c_season }}</td>
-            </tr>
-            <tr>
-                <td>Air Density (\(\rho\)) [kg/m³]</td>
-                <td>{{ calculation.rho }}</td>
-            </tr>
-            <tr>
-                <td>Terrain Category</td>
-                <td>{{ calculation.terrain_category }}</td>
-            </tr>
-            <tr>
-                <td>Height to Eaves (\(h_e\)) [m]</td>
-                <td>{{ calculation.h_e }}</td>
-            </tr>
-            <tr>
-                <td>Height from Eaves to Ridge (\(h_r\)) [m]</td>
-                <td>{{ calculation.h_r }}</td>
-            </tr>
-        </table>
-        <button class="btn btn-secondary mt-2 no-print" onclick="downloadSection('input-parameters', 'input-parameters.pdf')">Download as PDF</button>
-    </div>
+        <!-- Process Overview -->
+        <div class="alert alert-secondary shadow-sm mb-4">
+            <h5 class="mb-2"><i class="fas fa-route me-2"></i>Process Overview</h5>
+            <ol class="mb-0">
+                <li>Enter hipped roof parameters (see tooltips for help).</li>
+                <li>Review calculated wind loads and coefficients for each roof zone.</li>
+                <li>Download or print results for your records or engineering reports.</li>
+                <li>See <b>Calculation Steps</b> for detailed formulas and explanations.</li>
+            </ol>
+        </div>
 
-    <!-- External Pressure Coefficients Section -->
-    <div id="external-pressure-coefficients">
-        <h2>External Pressure Coefficients</h2>
-        <table class="table table-striped">
-            <tr>
-                <th>Zone</th>
-                <th>Width [m]</th>
-                <th>Height [m]</th>
-                <th>Area [m²]</th>
-                <th>\(C_{pe}\) (Suction)</th>
-                <th>\(C_{pe}\) (Pressure)</th>
-            </tr>
-            {% for zone in zones %}
-            <tr>
-                <td>{{ zone.name }}</td>
-                <td>{{ zone.width|floatformat:2 }}</td>
-                <td>{{ zone.height|floatformat:2 }}</td>
-                <td>{{ zone.area|floatformat:2 }}</td>
-                <td>{{ zone.c_pe_suction|floatformat:3 }}</td>
-                <td>{{ zone.c_pe_pressure|floatformat:3|default:"N/A" }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        <button class="btn btn-secondary mt-2 no-print" onclick="downloadSection('external-pressure-coefficients', 'external-pressure-coefficients.pdf')">Download as PDF</button>
-    </div>
+        <!-- Input Parameters -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light d-flex align-items-center">
+                <h5 class="mb-0"><i class="fas fa-sliders-h me-2"></i>Input Parameters</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-bordered table-hover mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light" style="width: 40%">Calculation Name</th>
+                            <td>{{ calculation.calculation_name|default:"Unnamed Calculation" }}
+                                <span class="text-muted small ms-2">(Optional: for your reference)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Basic Wind Velocity (V_b0)</th>
+                            <td>{{ calculation.vb0|floatformat:2 }} m/s
+                                <span class="helper" data-bs-toggle="tooltip" title="The 10-minute mean wind speed at 10 m above ground in open terrain. Usually from meteorological data."><i class="fas fa-question-circle ms-1"></i></span>
+                                <span class="d-block text-muted small">Typical values: 20-30 m/s. Check local codes.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Directional Factor (C_direction)</th>
+                            <td>{{ calculation.c_direction|floatformat:2 }}
+                                <span class="helper" data-bs-toggle="tooltip" title="Adjusts for prevailing wind direction. Usually 1.0 unless local data suggests otherwise."><i class="fas fa-question-circle ms-1"></i></span>
+                                <span class="d-block text-muted small">Default: 1.0. Use local wind rose data if available.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Seasonal Factor (C_season)</th>
+                            <td>{{ calculation.c_season|floatformat:2 }}
+                                <span class="helper" data-bs-toggle="tooltip" title="Adjusts for seasonal wind variations. Usually 1.0 for annual maximum winds."><i class="fas fa-question-circle ms-1"></i></span>
+                                <span class="d-block text-muted small">Default: 1.0. Use 0.9 for summer-only structures.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Air Density (ρ)</th>
+                            <td>{{ calculation.rho|floatformat:2 }} kg/m³
+                                <span class="helper" data-bs-toggle="tooltip" title="Density of air at the site. Standard value is 1.25 kg/m³."><i class="fas fa-question-circle ms-1"></i></span>
+                                <span class="d-block text-muted small">Use 1.25 kg/m³ unless at high altitude.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Terrain Category</th>
+                            <td>{{ calculation.get_terrain_description }}
+                                <span class="helper" data-bs-toggle="tooltip" title="Describes the roughness of the surrounding terrain (e.g., open, suburban, urban)."><i class="fas fa-question-circle ms-1"></i></span>
+                                <span class="d-block text-muted small">Urban, suburban, open, or coastal. See Help for details.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Height to Eaves (h_e)</th>
+                            <td>{{ calculation.h_e|floatformat:2 }} m
+                                <span class="helper" data-bs-toggle="tooltip" title="Vertical distance from ground to the eaves (bottom edge) of the roof."><i class="fas fa-question-circle ms-1"></i></span>
+                                <span class="d-block text-muted small">Measure from ground to lowest roof edge.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Height to Ridge (h_r)</th>
+                            <td>{{ calculation.h_r|floatformat:2 }} m
+                                <span class="helper" data-bs-toggle="tooltip" title="Vertical distance from eaves to the highest point (ridge) of the roof."><i class="fas fa-question-circle ms-1"></i></span>
+                                <span class="d-block text-muted small">Measure from eaves to roof peak.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Total Height</th>
+                            <td>{{ calculation.get_total_height|floatformat:2 }} m
+                                <span class="helper" data-bs-toggle="tooltip" title="Sum of eaves and ridge heights. Used as reference height for wind calculations."><i class="fas fa-question-circle ms-1"></i></span>
+                                <span class="d-block text-muted small">Reference height for wind calculations.</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% if calculation.notes %}
+                <div class="alert alert-info mt-3"><strong>Notes:</strong> {{ calculation.notes }}</div>
+                {% endif %}
+            </div>
+        </div>
 
-    <!-- Net Wind Pressures Section -->
-    <div id="net-wind-pressures">
-        <h2>Net Wind Pressures</h2>
-        <table class="table table-striped">
-            <tr>
-                <th>Zone</th>
-                <th>Type</th>
-                <th>\(C_{pe}\)</th>
-                <th>\(C_{pi}\)</th>
-                <th>\(W_{net}\) [kN/m²]</th>
-            </tr>
-            {% for result in W_net_results %}
-            <tr>
-                <td>{{ result.zone }}</td>
-                <td>{{ result.type }}</td>
-                <td>{{ result.c_pe|floatformat:3 }}</td>
-                <td>{{ result.c_pi|floatformat:3 }}</td>
-                <td>{{ result.w_net|floatformat:3 }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        <button class="btn btn-secondary mt-2 no-print" onclick="downloadSection('net-wind-pressures', 'net-wind-pressures.pdf')">Download as PDF</button>
-    </div>
-
-    <!-- Maximum Net Wind Pressures Section -->
-    <div id="maximum-net-wind-pressures">
-        <h2>Maximum Net Wind Pressures</h2>
-        <p>Maximum Positive: {{ max_positive_W_net|floatformat:3 }} kN/m²</p>
-        <p>Maximum Negative: {{ min_negative_W_net|floatformat:3 }} kN/m²</p>
-        <button class="btn btn-secondary mt-2 no-print" onclick="downloadSection('maximum-net-wind-pressures', 'maximum-net-pressures.pdf')">Download as PDF</button>
-    </div>
-
-    <!-- Calculation Steps Section -->
-    <h2 class="mt-4">Calculation Steps</h2>
-    <div class="accordion" id="stepsAccordion">
-        {% for step in steps %}
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="step-{{ step.id }}-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step-{{ step.id }}-content" aria-expanded="false" aria-controls="step-{{ step.id }}-content">
-                    {{ step.title }} - Result: {{ step.result }}
-                </button>
-            </h2>
-            <div id="step-{{ step.id }}-content" class="accordion-collapse collapse" aria-labelledby="step-{{ step.id }}-header" data-bs-parent="#stepsAccordion">
-                <div id="step-{{ step.id }}-body" class="accordion-body">
-                    {% if step.formula %}
-                        <div class="formula">{{ step.formula_mathml|safe }}</div>
-                    {% endif %}
-                    <p><strong>Explanation:</strong> {{ step.explanation }}</p>
-                    <p><strong>Calculation:</strong> {{ step.calculation }}</p>
-                    <p><strong>Result:</strong> {{ step.result }}</p>
-                    {% if step.constants %}
-                        <p><strong>Constants:</strong></p>
-                        <ul>
-                            {% for key, value in step.constants.items %}
-                                <li>{{ key }}: {{ value }}</li>
+        <!-- Output: External Pressure Coefficients -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light d-flex align-items-center">
+                <h5 class="mb-0"><i class="fas fa-table me-2"></i>External Pressure Coefficients for Hipped Roof</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-2">These coefficients are used to determine wind pressures on different zones of the hipped roof. Suction is negative (uplift), pressure is positive (downward).</p>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Zone</th>
+                                <th>Width [m]</th>
+                                <th>Height [m]</th>
+                                <th>Area [m²]</th>
+                                <th>C_pe (Suction)</th>
+                                <th>C_pe (Pressure)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for zone in zones %}
+                            <tr>
+                                <td>{{ zone.name }}</td>
+                                <td>{{ zone.width|floatformat:2 }}</td>
+                                <td>{{ zone.height|floatformat:2 }}</td>
+                                <td>{{ zone.area|floatformat:2 }}</td>
+                                <td>{{ zone.c_pe_suction|floatformat:3 }}</td>
+                                <td>{{ zone.c_pe_pressure|floatformat:3|default:"N/A" }}</td>
+                            </tr>
                             {% endfor %}
-                        </ul>
-                    {% endif %}
-                    <p><strong>Detailed Explanation:</strong> {{ step.detailed_explanation }}</p>
-                    <button class="btn btn-primary no-print" onclick="downloadSection('step-{{ step.id }}-body', 'step-{{ step.id }}.pdf')">Download this step as PDF</button>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="small text-muted mt-2">See <b>Help</b> for more on how these coefficients are determined.</div>
+            </div>
+        </div>
+
+        <!-- Output: Net Wind Pressures -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light d-flex align-items-center">
+                <h5 class="mb-0"><i class="fas fa-wind me-2"></i>Net Wind Pressures for Hipped Roof</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-2">Net wind pressures are calculated for each zone of the hipped roof. These values are used for structural design and safety checks.</p>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Zone</th>
+                                <th>Type</th>
+                                <th>C_pe</th>
+                                <th>C_pi</th>
+                                <th>W_net [kN/m²]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in W_net_results %}
+                            <tr>
+                                <td>{{ result.zone }}</td>
+                                <td>{{ result.type }}</td>
+                                <td>{{ result.c_pe|floatformat:3 }}</td>
+                                <td>{{ result.c_pi|floatformat:3 }}</td>
+                                <td>{{ result.w_net|floatformat:3 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <strong>Maximum Positive Pressure:</strong> {{ max_positive_W_net|floatformat:3 }} kN/m²
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <strong>Maximum Negative Pressure:</strong> {{ min_negative_W_net|floatformat:3 }} kN/m²
+                        </div>
+                    </div>
+                </div>
+                <div class="small text-muted mt-2">For design, use the most critical (highest magnitude) value for each zone.</div>
+            </div>
+        </div>
+
+        <!-- Calculation Steps -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light d-flex align-items-center">
+                <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Calculation Steps &amp; Explanations</h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="calculationSteps">
+                    {% for step in steps %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                            <button class="accordion-button collapsed" type="button" 
+                                    data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}">
+                                <strong>Step {{ forloop.counter }}: {{ step.title }}</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" 
+                             aria-labelledby="heading{{ forloop.counter }}">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="calculation-step">
+                                            <h6 class="step-label">Formula:</h6>
+                                            <div class="formula-box">
+                                                \[{{ step.formula }}\]
+                                            </div>
+                                            
+                                            <h6 class="step-label">Input Values:</h6>
+                                            <div class="input-box">
+                                                <ul class="input-list">
+                                                    {% for key, value in step.inputs.items %}
+                                                    <li>\( {{ key }} \): {{ value }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            
+                                            <h6 class="step-label">Calculation Steps:</h6>
+                                            <div class="calculation-box">
+                                                <ol class="calculation-steps">
+                                                    {% for calc in step.calculation_steps %}
+                                                    <li>\[{{ calc }}\]</li>
+                                                    {% endfor %}
+                                                </ol>
+                                            </div>
+                                            
+                                            <h6 class="step-label">Result:</h6>
+                                            <div class="result-box">
+                                                \[{{ step.result }}\]
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="explanation-section">
+                                            <h6 class="step-label">Explanation:</h6>
+                                            <p class="explanation-text">{{ step.explanation }}</p>
+                                            
+                                            {% if step.constants %}
+                                            <h6 class="step-label">Constants:</h6>
+                                            <div class="constants-box">
+                                                <ul class="constants-list">
+                                                    {% for key, value in step.constants.items %}
+                                                    <li>\( {{ key }} \): {{ value }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if step.considerations %}
+                                            <h6 class="step-label">Important Considerations:</h6>
+                                            <div class="considerations-box">
+                                                <ul class="considerations-list">
+                                                    {% for consideration in step.considerations %}
+                                                    <li>{{ consideration }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if step.detailed_explanation %}
+                                <div class="mt-3">
+                                    <h6 class="step-label">Detailed Explanation:</h6>
+                                    <p class="detailed-explanation">{{ step.detailed_explanation }}</p>
+                                </div>
+                                {% endif %}
+                                <div class="mt-3 text-end no-print">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="downloadStep('{{ forloop.counter }}')">
+                                        <i class="fas fa-download me-1"></i>Download Step
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-        {% endfor %}
-    </div>
 
-    <!-- Download and Navigation Links -->
-    <div class="mt-4 no-print">
-        <button class="btn btn-primary" onclick="downloadSection('wind-load-results', 'wind-load-results.pdf')">Download Full Calculation as PDF</button>
-        <a href="?format=csv" class="btn btn-secondary">Download Net Wind Pressures as CSV</a>
-        <a href="{% url 'wind_load_analysis_on_hipped_roof' %}" class="btn btn-secondary">Back to Calculator</a>
+        <!-- Actions -->
+        <div class="d-flex justify-content-between mb-4 no-print">
+            <a href="{% url 'wind_load_analysis_on_hipped_roof' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Input
+            </a>
+            <div>
+                <button class="btn btn-primary me-2" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>Print Results
+                </button>
+                <button class="btn btn-success me-2" onclick="downloadAsPDF()">
+                    <i class="fas fa-file-pdf me-2"></i>Export PDF
+                </button>
+            </div>
+        </div>
+        <!-- History and Help Placeholders -->
+        <div class="d-flex justify-content-between mb-4">
+            <a href="{% url 'wind_load_history' %}" class="btn btn-outline-info">
+                <i class="fas fa-history me-2"></i>View Calculation History
+            </a>
+            <a href="#" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#helpModal">
+                <i class="fas fa-question-circle me-2"></i>Help &amp; Documentation
+            </a>
+        </div>
+        <!-- Help Modal -->
+        <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="helpModalLabel"><i class="fas fa-question-circle me-2"></i>Help &amp; Documentation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Glossary of Terms</h6>
+                        <ul>
+                            <li><b>V_b0</b>: Basic wind velocity (m/s)</li>
+                            <li><b>C_direction</b>: Directional factor</li>
+                            <li><b>C_season</b>: Seasonal factor</li>
+                            <li><b>ρ</b>: Air density (kg/m³)</li>
+                            <li><b>h_e</b>: Height to eaves (m)</li>
+                            <li><b>h_r</b>: Height to ridge (m)</li>
+                            <li><b>C_pe</b>: External pressure coefficient</li>
+                            <li><b>C_pi</b>: Internal pressure coefficient</li>
+                            <li><b>W_net</b>: Net wind pressure (kN/m²)</li>
+                        </ul>
+                        <h6>FAQ</h6>
+                        <ul>
+                            <li><b>Where do I get V_b0?</b> — From local meteorological data or building codes.</li>
+                            <li><b>What terrain category should I use?</b> — See the tooltip or Help for guidance.</li>
+                            <li><b>How do I use the results?</b> — Use the most critical (highest magnitude) net wind pressure for each zone in your structural design.</li>
+                        </ul>
+                        <h6>References</h6>
+                        <ul>
+                            <li>EN 1991-1-4: Eurocode 1: Actions on structures – Wind actions</li>
+                            <li>Local building codes and standards</li>
+                        </ul>
+                        <h6>Example Calculation</h6>
+                        <p>See the <b>Calculation Steps</b> section for a worked example based on your input.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
-{% block extra_scripts %}
-{{ block.super }}
+{% block extra_css %}
+<style>
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+            page-break-inside: avoid;
+        }
+        .card-header {
+            background-color: white !important;
+            color: black !important;
+        }
+        .table th {
+            background-color: #f8f9fa !important;
+        }
+        .accordion-button:not(.collapsed) {
+            background-color: white !important;
+            color: black !important;
+        }
+        .accordion-button::after {
+            display: none !important;
+        }
+        .accordion-button:not(.collapsed)::after {
+            display: none !important;
+        }
+        .accordion-collapse {
+            display: block !important;
+        }
+    }
+
+    /* Calculation Steps Styling */
+    .calculation-step {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .step-label {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        font-size: 1.1rem;
+    }
+
+    .formula-box, .calculation-box, .result-box {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .formula-box {
+        border-left: 4px solid #3498db;
+    }
+
+    .calculation-box {
+        border-left: 4px solid #2ecc71;
+    }
+
+    .result-box {
+        border-left: 4px solid #e74c3c;
+        font-weight: bold;
+    }
+
+    .explanation-section {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+    }
+
+    .explanation-text {
+        color: #34495e;
+        line-height: 1.6;
+    }
+
+    .input-box {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-left: 4px solid #f39c12;
+    }
+
+    .input-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+    .input-list li {
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+
+    .calculation-steps {
+        padding-left: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .calculation-steps li {
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+
+    .calculation-steps li:last-child {
+        margin-bottom: 0;
+    }
+
+    .considerations-box {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-top: 1rem;
+        border-left: 4px solid #8e44ad;
+    }
+
+    .considerations-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+    .considerations-list li {
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+    .considerations-list li:before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #8e44ad;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-<script src="{% static 'js/pdf_download.js' %}"></script>
 <script>
+    function downloadAsPDF() {
+        const element = document.querySelector('.col-lg-10');
+        const opt = {
+            margin: [10, 10, 10, 10],
+            filename: 'wind_load_analysis_hipped_roof.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                letterRendering: true,
+                logging: true
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait'
+            },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        // Show loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.position = 'fixed';
+        loadingDiv.style.top = '50%';
+        loadingDiv.style.left = '50%';
+        loadingDiv.style.transform = 'translate(-50%, -50%)';
+        loadingDiv.style.padding = '20px';
+        loadingDiv.style.background = 'rgba(0, 0, 0, 0.7)';
+        loadingDiv.style.color = 'white';
+        loadingDiv.style.borderRadius = '5px';
+        loadingDiv.style.zIndex = '9999';
+        loadingDiv.innerHTML = 'Generating PDF...';
+        document.body.appendChild(loadingDiv);
+
+        // Generate PDF
+        html2pdf().set(opt).from(element).save().then(() => {
+            // Remove loading indicator
+            document.body.removeChild(loadingDiv);
+        });
+    }
+
+    function downloadStep(stepNumber) {
+        const stepElement = document.querySelector(`#collapse${stepNumber} .accordion-body`);
+        const opt = {
+            margin: [10, 10, 10, 10],
+            filename: `wind_load_step_${stepNumber}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                letterRendering: true
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait'
+            }
+        };
+        html2pdf().set(opt).from(stepElement).save();
+    }
+
     // Enable Bootstrap tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 </script>
 {% endblock %}

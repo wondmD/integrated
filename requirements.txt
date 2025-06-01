@@ -1,1 +1,10 @@
-django
+Django==5.0.1
+pytest==8.0.0
+pytest-django==4.8.0
+coverage==7.4.1
+reportlab==4.1.0
+Pillow==10.2.0
+django-crispy-forms==2.1
+crispy-bootstrap5==2023.10
+django-debug-toolbar==4.3.0
+python-dotenv==1.0.1

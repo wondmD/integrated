@@ -9,4 +9,5 @@ from . import views
 
 urlpatterns = [
     path('', views.wind_load_analysis_on_hipped_roof, name='wind_load_analysis_on_hipped_roof'),
+    path('history/', views.wind_load_history, name='wind_load_history'),
 ]

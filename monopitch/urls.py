@@ -2,6 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.monopitch_calculate, name='monopitch_calculate'),
+    path('', views.wind_load_analysis_on_monopitch_roof, name='monopitch_calculate'),
    
 ]

@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}Help - Wind Load Calculator{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Introduction -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="display-4 mb-4">Help Center</h1>
+            <p class="lead">
+                Find answers to common questions and learn how to use the Wind Load Calculator effectively.
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Start Guide -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4">Quick Start Guide</h2>
+            <div class="card">
+                <div class="card-body">
+                    <div class="accordion" id="quickStartGuide">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#step1">
+                                    Step 1: Enter Building Dimensions
+                                </button>
+                            </h2>
+                            <div id="step1" class="accordion-collapse collapse show" 
+                                 data-bs-parent="#quickStartGuide">
+                                <div class="accordion-body">
+                                    <p>Enter the following building dimensions:</p>
+                                    <ul>
+                                        <li><strong>Height:</strong> Total height of the building from ground level</li>
+                                        <li><strong>In-wind Depth:</strong> Depth of the building in the direction of wind</li>
+                                        <li><strong>Width:</strong> Width of the building perpendicular to wind direction</li>
+                                    </ul>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        All dimensions should be entered in meters (m).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#step2">
+                                    Step 2: Specify Site Parameters
+                                </button>
+                            </h2>
+                            <div id="step2" class="accordion-collapse collapse" 
+                                 data-bs-parent="#quickStartGuide">
+                                <div class="accordion-body">
+                                    <p>Enter the following site parameters:</p>
+                                    <ul>
+                                        <li><strong>Site Altitude:</strong> Altitude of the building site above sea level</li>
+                                        <li><strong>Terrain Category:</strong> Category of terrain surrounding the building (1-4)</li>
+                                        <li><strong>Upwind Slope:</strong> Slope of the terrain upwind of the building</li>
+                                        <li><strong>Orographic Factor:</strong> Factor accounting for local topography effects</li>
+                                    </ul>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Terrain categories are defined in the standards:
+                                        <ul class="mb-0">
+                                            <li>Category 1: Open sea, lakes, flat terrain</li>
+                                            <li>Category 2: Open country with low vegetation</li>
+                                            <li>Category 3: Suburban areas, industrial areas</li>
+                                            <li>Category 4: Urban areas with tall buildings</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#step3">
+                                    Step 3: Define Opening Parameters
+                                </button>
+                            </h2>
+                            <div id="step3" class="accordion-collapse collapse" 
+                                 data-bs-parent="#quickStartGuide">
+                                <div class="accordion-body">
+                                    <p>Specify the following opening parameters:</p>
+                                    <ul>
+                                        <li><strong>Windward Openings:</strong> Number of openings on windward face</li>
+                                        <li><strong>Leeward Openings:</strong> Number of openings on leeward face</li>
+                                        <li><strong>Parallel Openings:</strong> Number of openings on parallel faces</li>
+                                        <li><strong>Windward Area:</strong> Total area of windward openings (mm²)</li>
+                                        <li><strong>Leeward Area:</strong> Total area of leeward openings (mm²)</li>
+                                        <li><strong>Parallel Area:</strong> Total area of parallel openings (mm²)</li>
+                                    </ul>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Opening areas should be entered in square millimeters (mm²).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#step4">
+                                    Step 4: Review and Calculate
+                                </button>
+                            </h2>
+                            <div id="step4" class="accordion-collapse collapse" 
+                                 data-bs-parent="#quickStartGuide">
+                                <div class="accordion-body">
+                                    <p>Before calculating:</p>
+                                    <ul>
+                                        <li>Review all input parameters for accuracy</li>
+                                        <li>Ensure all required fields are filled</li>
+                                        <li>Check that values are within reasonable ranges</li>
+                                    </ul>
+                                    <p>Click the "Calculate" button to perform the calculations.</p>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        The calculation process may take a few seconds.
+                                        Please wait for the results to be displayed.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4">Frequently Asked Questions</h2>
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#faq1">
+                            What standards does the calculator support?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            The calculator supports the following standards:
+                            <ul>
+                                <li>Eurocode 1 (EN 1991-1-4)</li>
+                                <li>ASCE 7</li>
+                                <li>AS/NZS 1170.2</li>
+                            </ul>
+                            You can select the appropriate standard for your region in the calculator settings.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#faq2">
+                            How accurate are the calculations?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            The calculator provides accurate results based on the input parameters and
+                            selected standard. However, the accuracy depends on:
+                            <ul>
+                                <li>Accuracy of input parameters</li>
+                                <li>Appropriateness of the selected standard</li>
+                                <li>Complexity of the building geometry</li>
+                            </ul>
+                            For complex buildings or critical applications, we recommend verifying the
+                            results with a qualified structural engineer.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#faq3">
+                            Can I save my calculations?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes, you can save your calculations in several ways:
+                            <ul>
+                                <li>Print the results page</li>
+                                <li>Export the results as a PDF</li>
+                                <li>Save the input parameters for future use</li>
+                            </ul>
+                            To save your calculations, use the buttons provided in the results page.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#faq4">
+                            What if I get an error message?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" 
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            If you receive an error message:
+                            <ol>
+                                <li>Check that all required fields are filled</li>
+                                <li>Verify that input values are within valid ranges</li>
+                                <li>Ensure that the selected standard is appropriate for your region</li>
+                                <li>If the error persists, contact our support team</li>
+                            </ol>
+                            Common error messages and their solutions are provided in the error page.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Support -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2 class="mb-4">Need More Help?</h2>
+            <p class="lead mb-4">
+                If you couldn't find the answer to your question, our support team is here to help.
+            </p>
+            <a href="mailto:support@windloadcalculator.com" class="btn btn-primary btn-lg">
+                <i class="fas fa-envelope me-2"></i>Contact Support
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize accordions
+    var accordionElementList = [].slice.call(document.querySelectorAll('.accordion'))
+    var accordionList = accordionElementList.map(function (accordionEl) {
+        return new bootstrap.Accordion(accordionEl)
+    });
+</script>
+{% endblock %} 
