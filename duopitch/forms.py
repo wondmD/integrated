@@ -248,6 +248,18 @@ class WindLoadCalculationForm(forms.ModelForm):
             'notes': 'Add any additional information about this calculation'
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Group fields into categories
+        self.fieldsets = {
+            'Basic Information': ['calculation_name', 'notes'],
+            'Wind Parameters': ['vb0', 'c_direction', 'c_season', 'rho', 'terrain_category'],
+            'Building Geometry': ['ridge_height', 'building_length', 'building_width', 'pitch_angle'],
+            'Site Parameters': ['site_altitude', 'upwind_slope', 'horizontal_distance', 'effective_height', 'upwind_slope_length'],
+            'Opening Parameters': ['windward_openings_area', 'leeward_openings_area', 'parallel_openings_area'],
+            'Structural Parameters': ['structural_factor', 'purlin_spacing', 'truss_spacing']
+        }
+
     def clean(self):
         cleaned_data = super().clean()
         ridge_height = cleaned_data.get('ridge_height')

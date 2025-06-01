@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Wind Load Calculation Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 2cm;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2cm;
+        }
+        .section {
+            margin-bottom: 1cm;
+        }
+        .section-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 0.5cm;
+            border-bottom: 1px solid #000;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1cm;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 0.3cm;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .notes {
+            margin-top: 2cm;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Wind Load Calculation Results</h1>
+        <p>Calculation Name: {{ calculation.calculation_name }}</p>
+        <p>Date: {{ calculation.created_at|date:"F j, Y" }}</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Input Parameters</div>
+        <table>
+            <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+                <th>Unit</th>
+            </tr>
+            <tr>
+                <td>Basic Wind Velocity (Vb0)</td>
+                <td>{{ calculation.vb0 }}</td>
+                <td>m/s</td>
+            </tr>
+            <tr>
+                <td>Directional Factor (Cdirection)</td>
+                <td>{{ calculation.c_direction }}</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>Seasonal Factor (Cseason)</td>
+                <td>{{ calculation.c_season }}</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>Air Density (ρ)</td>
+                <td>{{ calculation.rho }}</td>
+                <td>kg/m³</td>
+            </tr>
+            <tr>
+                <td>Terrain Category</td>
+                <td>{{ calculation.get_terrain_category_display }}</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>Ridge Height</td>
+                <td>{{ calculation.ridge_height }}</td>
+                <td>m</td>
+            </tr>
+            <tr>
+                <td>Building Length</td>
+                <td>{{ calculation.building_length }}</td>
+                <td>m</td>
+            </tr>
+            <tr>
+                <td>Building Width</td>
+                <td>{{ calculation.building_width }}</td>
+                <td>m</td>
+            </tr>
+            <tr>
+                <td>Pitch Angle</td>
+                <td>{{ calculation.pitch_angle }}</td>
+                <td>degrees</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Wind Load Results (θ = 0°)</div>
+        <table>
+            <tr>
+                <th>Zone</th>
+                <th>External Pressure Coefficient (Cpe)</th>
+                <th>Net Wind Pressure (We)</th>
+                <th>Unit</th>
+            </tr>
+            {% for result in results.results_0 %}
+            <tr>
+                <td>{{ result.zone }}</td>
+                <td>{{ result.c_pe }}</td>
+                <td>{{ result.w_e }}</td>
+                <td>kN/m²</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Wind Load Results (θ = 90°)</div>
+        <table>
+            <tr>
+                <th>Zone</th>
+                <th>External Pressure Coefficient (Cpe)</th>
+                <th>Net Wind Pressure (We)</th>
+                <th>Unit</th>
+            </tr>
+            {% for result in results.results_90 %}
+            <tr>
+                <td>{{ result.zone }}</td>
+                <td>{{ result.c_pe }}</td>
+                <td>{{ result.w_e }}</td>
+                <td>kN/m²</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Structural Loads</div>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Load</th>
+                <th>Unit</th>
+            </tr>
+            {% for load in results.purlin_loads %}
+            <tr>
+                <td>Purlin {{ forloop.counter }}</td>
+                <td>{{ load }}</td>
+                <td>kN/m</td>
+            </tr>
+            {% endfor %}
+            {% for load in results.truss_loads %}
+            <tr>
+                <td>Truss {{ forloop.counter }}</td>
+                <td>{{ load }}</td>
+                <td>kN</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Calculation Notes</div>
+        <div class="notes">
+            {{ calculation.notes|linebreaks }}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Calculation Explanation</div>
+        <div class="notes">
+            {{ results.explanation|linebreaks }}
+        </div>
+    </div>
+</body>
+</html> 
