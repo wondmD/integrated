@@ -1,157 +1,263 @@
 from django import forms
+from .models import WindLoadCalculation
 
-class DuopitchRoofForm(forms.Form):
-    building_length = forms.FloatField(
-        label='Building Length (L, m)',
-        min_value=0,
-        initial=30.0,
-        help_text=(
-            "<strong>Meaning:</strong> The horizontal dimension parallel to the roof’s ridge, per ES EN 1991-1-4:2015 Section 7.2.5. "
-            "<strong>Impact:</strong> Affects structural response but does not directly influence zone definitions, which depend on width (b) and height (h)."
-        )
-    )
-    building_width = forms.FloatField(
-        label='Building Width (b, m)',
-        min_value=0,
-        initial=12.0,
-        help_text=(
-            "<strong>Meaning:</strong> The horizontal dimension perpendicular to the roof’s ridge, per ES EN 1991-1-4:2015 Section 7.2.5. "
-            "<strong>Impact:</strong> Determines characteristic length (e = min(b, 2h)), setting pressure zone extents (F, G, H, I, J). Larger b increases zone sizes."
-        )
-    )
-    ridge_height = forms.FloatField(
-        label='Ridge Height (h, m)',
-        min_value=0,
-        initial=6.1,
-        help_text=(
-            "<strong>Meaning:</strong> The height from ground to the roof’s ridge, per ES EN 1991-1-4:2015 Section 7.2.5. It is the reference height (z_e). "
-            "<strong>Impact:</strong> Affects z_e and characteristic length (e = min(b, 2h)). Higher h increases wind velocity (v_m) and peak pressure (q_p)."
-        )
-    )
-    pitch_angle = forms.FloatField(
-        label='Pitch Angle (α, degrees)',
-        min_value=-75,
-        max_value=75,
-        initial=15.0,
-        help_text=(
-            "<strong>Meaning:</strong> The angle of the roof slope, per ES EN 1991-1-4:2015 Section 7.2.5. It defines the duopitch roof’s geometry. "
-            "<strong>Impact:</strong> Determines external pressure coefficients (c_pe) via Table 7.4a/b. Steeper angles affect suction or downward pressures."
-        )
-    )
-    site_altitude = forms.FloatField(
-        label='Site Altitude (h_o, m)',
-        min_value=0,
-        initial=1650.0,
-        help_text=(
-            "<strong>Meaning:</strong> The altitude above sea level, per ES EN 1991-1-4:2015 Section 4.2. "
-            "<strong>Impact:</strong> Reduces air density (ρ), lowering velocity pressures (q_b, q_p) and wind loads."
-        )
-    )
-    terrain_category = forms.ChoiceField(
-        label='Terrain Category',
-        choices=[(1, 'I (Sea, flat country)'), (2, 'II (Farmland, hedges)'),
-                 (3, 'III (Suburban, forests)'), (4, 'IV (Urban, skyscrapers)')],
-        initial=3,
-        help_text=(
-            "<strong>Meaning:</strong> The terrain category describes the surrounding environment’s roughness, per ES EN 1991-1-4:2015 Table 4.1. "
-            "<strong>Impact:</strong> Sets roughness length (z_0) and minimum height (z_min), affecting terrain factor (k_r) and roughness factor (c_r). Rougher terrains reduce wind loads."
-        )
-    )
-    upwind_slope = forms.FloatField(
-        label='Upwind Slope (H/L_u)',
-        min_value=0,
-        initial=0.06,
-        help_text=(
-            "<strong>Meaning:</strong> The slope of the upwind terrain (H/L_u), per ES EN 1991-1-4:2015 Annex A. "
-            "<strong>Impact:</strong> Influences orography factor (c_0). Steeper slopes increase c_0, amplifying wind velocity (v_m) and loads."
-        )
-    )
-    horizontal_distance = forms.FloatField(
-        label='Horizontal Distance from Crest (x, m)',
-        initial=-200.0,
-        help_text=(
-            "<strong>Meaning:</strong> The distance from the hill crest to the site, per ES EN 1991-1-4:2015 Annex A. "
-            "<strong>Impact:</strong> Affects orographic factor (s). Locations closer to the crest may increase wind loads."
-        )
-    )
-    effective_height = forms.FloatField(
-        label='Effective Height of Hill (H, m)',
-        min_value=0,
-        initial=30.0,
-        help_text=(
-            "<strong>Meaning:</strong> The effective height of the upwind hill, per ES EN 1991-1-4:2015 Annex A. "
-            "<strong>Impact:</strong> Influences orographic factor (s). Taller hills increase c_0, raising wind loads."
-        )
-    )
-    upwind_slope_length = forms.FloatField(
-        label='Upwind Slope Length (L_u, m)',
-        min_value=0,
-        initial=500.0,
-        help_text=(
-            "<strong>Meaning:</strong> The length of the upwind slope, per ES EN 1991-1-4:2015 Annex A. "
-            "<strong>Impact:</strong> Affects upwind slope (H/L_u) and orographic factor (s), influencing wind loads."
-        )
-    )
-    windward_openings_area = forms.FloatField(
-        label='Windward Openings Area (mm²)',
-        min_value=0,
-        initial=41.25,
-        help_text=(
-            "<strong>Meaning:</strong> The total area of openings on the windward face, per ES EN 1991-1-4:2015 Section 7.2.9. "
-            "<strong>Impact:</strong> Influences internal pressure coefficient (c_pi). Larger areas increase c_pi, affecting net pressures."
-        )
-    )
-    leeward_openings_area = forms.FloatField(
-        label='Leeward Openings Area (mm²)',
-        min_value=0,
-        initial=41.25,
-        help_text=(
-            "<strong>Meaning:</strong> The total area of openings on the leeward face, per ES EN 1991-1-4:2015 Section 7.2.9. "
-            "<strong>Impact:</strong> Affects internal pressure coefficient (c_pi). Larger areas influence c_pi and net pressures."
-        )
-    )
-    parallel_openings_area = forms.FloatField(
-        label='Parallel Openings Area (mm²)',
-        min_value=0,
-        initial=37.0,
-        help_text=(
-            "<strong>Meaning:</strong> The total area of openings on faces parallel to the wind, per ES EN 1991-1-4:2015 Section 7.2.9. "
-            "<strong>Impact:</strong> Contributes to internal pressure coefficient (c_pi), affecting net pressures."
-        )
-    )
-    purlin_spacing = forms.FloatField(
-        label='Purlin Spacing (m)',
-        min_value=0,
-        initial=1.5525,
-        help_text=(
-            "<strong>Meaning:</strong> The distance between purlins supporting the roof, per ES EN 1991-1-4:2015. "
-            "<strong>Impact:</strong> Multiplies net pressure (w_e) to calculate load per unit length on purlins (F_w,purlin). Larger spacing increases loads."
-        )
-    )
-    truss_spacing = forms.FloatField(
-        label='Truss Spacing (m)',
-        min_value=0,
-        initial=3.0,
-        help_text=(
-            "<strong>Meaning:</strong> The distance between trusses supporting the roof, per ES EN 1991-1-4:2015. "
-            "<strong>Impact:</strong> Multiplies purlin load (F_w,purlin) to calculate point load on trusses (F_w,truss). Larger spacing increases loads."
-        )
-    )
-    basic_wind_velocity = forms.FloatField(
-        label='Basic Wind Velocity (V_b,o, m/s)',
-        min_value=0,
-        initial=22.0,
-        help_text=(
-            "<strong>Meaning:</strong> The 10-minute mean wind speed at 10 m above ground in terrain category II, per ES EN 1991-1-4:2015 Section 4.2. "
-            "<strong>Impact:</strong> Directly influences mean wind velocity (v_m) and velocity pressures (q_b, q_p). Higher values increase wind loads."
-        )
-    )
-    structural_factor = forms.FloatField(
-        label='Structural Factor (C_sC_d)',
-        min_value=0,
-        initial=1.0,
-        help_text=(
-            "<strong>Meaning:</strong> The structural factor accounts for dynamic response and size effects, per ES EN 1991-1-4:2015 Section 6. "
-            "<strong>Impact:</strong> Multiplies net pressure to calculate wind force (F_w). Typically 1.0 for small structures."
-        )
-    )
+class WindLoadCalculationForm(forms.ModelForm):
+    class Meta:
+        model = WindLoadCalculation
+        fields = [
+            'calculation_name',
+            'vb0',
+            'c_direction',
+            'c_season',
+            'rho',
+            'terrain_category',
+            'ridge_height',
+            'building_length',
+            'building_width',
+            'pitch_angle',
+            'site_altitude',
+            'upwind_slope',
+            'horizontal_distance',
+            'effective_height',
+            'upwind_slope_length',
+            'windward_openings_area',
+            'leeward_openings_area',
+            'parallel_openings_area',
+            'structural_factor',
+            'purlin_spacing',
+            'truss_spacing',
+            'notes'
+        ]
+        widgets = {
+            'calculation_name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Enter a name for this calculation'}
+            ),
+            'vb0': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'min': '0',
+                    'max': '100',
+                    'placeholder': 'Enter wind velocity (m/s)'
+                }
+            ),
+            'c_direction': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'min': '0',
+                    'max': '1',
+                    'placeholder': 'Enter directional factor'
+                }
+            ),
+            'c_season': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'min': '0',
+                    'max': '1',
+                    'placeholder': 'Enter seasonal factor'
+                }
+            ),
+            'rho': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'min': '1.0',
+                    'max': '1.5',
+                    'placeholder': 'Enter air density (kg/m³)'
+                }
+            ),
+            'terrain_category': forms.Select(
+                attrs={'class': 'form-control'}
+            ),
+            'ridge_height': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'min': '0',
+                    'placeholder': 'Enter ridge height (m)'
+                }
+            ),
+            'building_length': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'min': '0',
+                    'placeholder': 'Enter building length (m)'
+                }
+            ),
+            'building_width': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'min': '0',
+                    'placeholder': 'Enter building width (m)'
+                }
+            ),
+            'pitch_angle': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'min': '-75',
+                    'max': '75',
+                    'placeholder': 'Enter pitch angle (degrees)'
+                }
+            ),
+            'site_altitude': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'min': '0',
+                    'placeholder': 'Enter site altitude (m)'
+                }
+            ),
+            'upwind_slope': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'min': '0',
+                    'placeholder': 'Enter upwind slope'
+                }
+            ),
+            'horizontal_distance': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'placeholder': 'Enter horizontal distance from crest (m)'
+                }
+            ),
+            'effective_height': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'min': '0',
+                    'placeholder': 'Enter effective height of crest (m)'
+                }
+            ),
+            'upwind_slope_length': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'min': '0',
+                    'placeholder': 'Enter upwind slope length (m)'
+                }
+            ),
+            'windward_openings_area': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'min': '0',
+                    'placeholder': 'Enter windward openings area (m²)'
+                }
+            ),
+            'leeward_openings_area': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'min': '0',
+                    'placeholder': 'Enter leeward openings area (m²)'
+                }
+            ),
+            'parallel_openings_area': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'min': '0',
+                    'placeholder': 'Enter parallel openings area (m²)'
+                }
+            ),
+            'structural_factor': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'min': '0',
+                    'placeholder': 'Enter structural factor'
+                }
+            ),
+            'purlin_spacing': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'min': '0',
+                    'placeholder': 'Enter purlin spacing (m)'
+                }
+            ),
+            'truss_spacing': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': '0.1',
+                    'min': '0',
+                    'placeholder': 'Enter truss spacing (m)'
+                }
+            ),
+            'notes': forms.Textarea(
+                attrs={
+                    'class': 'form-control',
+                    'rows': '3',
+                    'placeholder': 'Add any additional notes here'
+                }
+            )
+        }
+        labels = {
+            'calculation_name': 'Calculation Name',
+            'vb0': 'Fundamental Basic Wind Velocity (V_b0, m/s)',
+            'c_direction': 'Directional Factor (C_direction)',
+            'c_season': 'Seasonal Factor (C_season)',
+            'rho': 'Air Density (ρ, kg/m³)',
+            'terrain_category': 'Terrain Category',
+            'ridge_height': 'Ridge Height (h, m)',
+            'building_length': 'Building Length (L, m)',
+            'building_width': 'Building Width (b, m)',
+            'pitch_angle': 'Pitch Angle (α, degrees)',
+            'site_altitude': 'Site Altitude (m)',
+            'upwind_slope': 'Upwind Slope (φ)',
+            'horizontal_distance': 'Horizontal Distance from Crest (m)',
+            'effective_height': 'Effective Height of Crest (m)',
+            'upwind_slope_length': 'Upwind Slope Length (m)',
+            'windward_openings_area': 'Windward Openings Area (m²)',
+            'leeward_openings_area': 'Leeward Openings Area (m²)',
+            'parallel_openings_area': 'Parallel Openings Area (m²)',
+            'structural_factor': 'Structural Factor (c_s c_d)',
+            'purlin_spacing': 'Purlin Spacing (m)',
+            'truss_spacing': 'Truss Spacing (m)',
+            'notes': 'Additional Notes'
+        }
+        help_texts = {
+            'calculation_name': 'Give this calculation a descriptive name for future reference',
+            'vb0': 'The 10-minute mean wind speed at 10 m above ground',
+            'c_direction': 'Factor accounting for wind direction effects (typically 1.0)',
+            'c_season': 'Factor accounting for seasonal wind variations (typically 1.0)',
+            'rho': 'Density of air at the site (typically 1.25 kg/m³)',
+            'terrain_category': 'Describes the surrounding environment\'s roughness',
+            'ridge_height': 'Height from ground to the roof\'s ridge',
+            'building_length': 'Length of the building parallel to the ridge',
+            'building_width': 'Width of the building perpendicular to the ridge',
+            'pitch_angle': 'Angle of the roof slope relative to horizontal',
+            'site_altitude': 'Elevation of the site above sea level',
+            'upwind_slope': 'Slope of the terrain upwind of the building',
+            'horizontal_distance': 'Distance from building to crest of upwind terrain',
+            'effective_height': 'Height of upwind terrain crest relative to site',
+            'upwind_slope_length': 'Length of the upwind terrain slope',
+            'windward_openings_area': 'Total area of openings on windward face',
+            'leeward_openings_area': 'Total area of openings on leeward face',
+            'parallel_openings_area': 'Total area of openings on parallel faces',
+            'structural_factor': 'Factor accounting for building\'s dynamic response',
+            'purlin_spacing': 'Distance between purlins supporting the roof',
+            'truss_spacing': 'Distance between trusses supporting the roof',
+            'notes': 'Add any additional information about this calculation'
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        ridge_height = cleaned_data.get('ridge_height')
+        building_width = cleaned_data.get('building_width')
+
+        # Validate building proportions
+        if ridge_height is not None and building_width is not None:
+            if ridge_height > building_width:
+                raise forms.ValidationError(
+                    "The ridge height cannot be greater than the building width."
+                )
+
+        return cleaned_data

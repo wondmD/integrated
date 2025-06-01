@@ -5,7 +5,7 @@
 <div class="container mt-5">
     <h2>Duopitch Roof Wind Load Calculator</h2>
     <p>Calculate wind pressure loads on duopitch roofs per ES EN 1991-1-4:2015, Section 7.2.5. Enter the parameters below and click the info icon for details on each input.</p>
-    <form method="post" action="{% url 'duopitch_calculate' %}">
+    <form method="post" action="{% url 'duopitch:wind_load_calculate' %}">
         {% csrf_token %}
         <div class="row">
             {% for field in form %}
