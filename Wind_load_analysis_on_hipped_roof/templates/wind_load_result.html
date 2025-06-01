@@ -47,63 +47,63 @@
                                 <span class="helper" data-bs-toggle="tooltip" title="The 10-minute mean wind speed at 10 m above ground in open terrain. Usually from meteorological data."><i class="fas fa-question-circle ms-1"></i></span>
                                 <span class="d-block text-muted small">Typical values: 20-30 m/s. Check local codes.</span>
                             </td>
-                        </tr>
-                        <tr>
+            </tr>
+            <tr>
                             <th class="bg-light">Directional Factor (C_direction)</th>
                             <td>{{ calculation.c_direction|floatformat:2 }}
                                 <span class="helper" data-bs-toggle="tooltip" title="Adjusts for prevailing wind direction. Usually 1.0 unless local data suggests otherwise."><i class="fas fa-question-circle ms-1"></i></span>
                                 <span class="d-block text-muted small">Default: 1.0. Use local wind rose data if available.</span>
                             </td>
-                        </tr>
-                        <tr>
+            </tr>
+            <tr>
                             <th class="bg-light">Seasonal Factor (C_season)</th>
                             <td>{{ calculation.c_season|floatformat:2 }}
                                 <span class="helper" data-bs-toggle="tooltip" title="Adjusts for seasonal wind variations. Usually 1.0 for annual maximum winds."><i class="fas fa-question-circle ms-1"></i></span>
                                 <span class="d-block text-muted small">Default: 1.0. Use 0.9 for summer-only structures.</span>
                             </td>
-                        </tr>
-                        <tr>
+            </tr>
+            <tr>
                             <th class="bg-light">Air Density (ρ)</th>
                             <td>{{ calculation.rho|floatformat:2 }} kg/m³
                                 <span class="helper" data-bs-toggle="tooltip" title="Density of air at the site. Standard value is 1.25 kg/m³."><i class="fas fa-question-circle ms-1"></i></span>
                                 <span class="d-block text-muted small">Use 1.25 kg/m³ unless at high altitude.</span>
                             </td>
-                        </tr>
-                        <tr>
+            </tr>
+            <tr>
                             <th class="bg-light">Terrain Category</th>
                             <td>{{ calculation.get_terrain_description }}
                                 <span class="helper" data-bs-toggle="tooltip" title="Describes the roughness of the surrounding terrain (e.g., open, suburban, urban)."><i class="fas fa-question-circle ms-1"></i></span>
                                 <span class="d-block text-muted small">Urban, suburban, open, or coastal. See Help for details.</span>
                             </td>
-                        </tr>
-                        <tr>
+            </tr>
+            <tr>
                             <th class="bg-light">Height to Eaves (h_e)</th>
                             <td>{{ calculation.h_e|floatformat:2 }} m
                                 <span class="helper" data-bs-toggle="tooltip" title="Vertical distance from ground to the eaves (bottom edge) of the roof."><i class="fas fa-question-circle ms-1"></i></span>
                                 <span class="d-block text-muted small">Measure from ground to lowest roof edge.</span>
                             </td>
-                        </tr>
-                        <tr>
+            </tr>
+            <tr>
                             <th class="bg-light">Height to Ridge (h_r)</th>
                             <td>{{ calculation.h_r|floatformat:2 }} m
                                 <span class="helper" data-bs-toggle="tooltip" title="Vertical distance from eaves to the highest point (ridge) of the roof."><i class="fas fa-question-circle ms-1"></i></span>
                                 <span class="d-block text-muted small">Measure from eaves to roof peak.</span>
                             </td>
-                        </tr>
-                        <tr>
+            </tr>
+            <tr>
                             <th class="bg-light">Total Height</th>
                             <td>{{ calculation.get_total_height|floatformat:2 }} m
                                 <span class="helper" data-bs-toggle="tooltip" title="Sum of eaves and ridge heights. Used as reference height for wind calculations."><i class="fas fa-question-circle ms-1"></i></span>
                                 <span class="d-block text-muted small">Reference height for wind calculations.</span>
                             </td>
-                        </tr>
+            </tr>
                     </tbody>
-                </table>
+        </table>
                 {% if calculation.notes %}
                 <div class="alert alert-info mt-3"><strong>Notes:</strong> {{ calculation.notes }}</div>
                 {% endif %}
             </div>
-        </div>
+    </div>
 
         <!-- Output: External Pressure Coefficients -->
         <div class="card mb-4 shadow-sm">
@@ -115,32 +115,32 @@
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered table-hover">
                         <thead class="table-light">
-                            <tr>
-                                <th>Zone</th>
-                                <th>Width [m]</th>
-                                <th>Height [m]</th>
-                                <th>Area [m²]</th>
+            <tr>
+                <th>Zone</th>
+                <th>Width [m]</th>
+                <th>Height [m]</th>
+                <th>Area [m²]</th>
                                 <th>C_pe (Suction)</th>
                                 <th>C_pe (Pressure)</th>
-                            </tr>
+            </tr>
                         </thead>
                         <tbody>
-                            {% for zone in zones %}
-                            <tr>
-                                <td>{{ zone.name }}</td>
-                                <td>{{ zone.width|floatformat:2 }}</td>
-                                <td>{{ zone.height|floatformat:2 }}</td>
-                                <td>{{ zone.area|floatformat:2 }}</td>
-                                <td>{{ zone.c_pe_suction|floatformat:3 }}</td>
-                                <td>{{ zone.c_pe_pressure|floatformat:3|default:"N/A" }}</td>
-                            </tr>
-                            {% endfor %}
+            {% for zone in zones %}
+            <tr>
+                <td>{{ zone.name }}</td>
+                <td>{{ zone.width|floatformat:2 }}</td>
+                <td>{{ zone.height|floatformat:2 }}</td>
+                <td>{{ zone.area|floatformat:2 }}</td>
+                <td>{{ zone.c_pe_suction|floatformat:3 }}</td>
+                <td>{{ zone.c_pe_pressure|floatformat:3|default:"N/A" }}</td>
+            </tr>
+            {% endfor %}
                         </tbody>
-                    </table>
+        </table>
                 </div>
                 <div class="small text-muted mt-2">See <b>Help</b> for more on how these coefficients are determined.</div>
             </div>
-        </div>
+    </div>
 
         <!-- Output: Net Wind Pressures -->
         <div class="card mb-4 shadow-sm">
@@ -152,26 +152,26 @@
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered table-hover">
                         <thead class="table-light">
-                            <tr>
-                                <th>Zone</th>
-                                <th>Type</th>
+            <tr>
+                <th>Zone</th>
+                <th>Type</th>
                                 <th>C_pe</th>
                                 <th>C_pi</th>
                                 <th>W_net [kN/m²]</th>
-                            </tr>
+            </tr>
                         </thead>
                         <tbody>
-                            {% for result in W_net_results %}
-                            <tr>
-                                <td>{{ result.zone }}</td>
-                                <td>{{ result.type }}</td>
-                                <td>{{ result.c_pe|floatformat:3 }}</td>
-                                <td>{{ result.c_pi|floatformat:3 }}</td>
-                                <td>{{ result.w_net|floatformat:3 }}</td>
-                            </tr>
-                            {% endfor %}
+            {% for result in W_net_results %}
+            <tr>
+                <td>{{ result.zone }}</td>
+                <td>{{ result.type }}</td>
+                <td>{{ result.c_pe|floatformat:3 }}</td>
+                <td>{{ result.c_pi|floatformat:3 }}</td>
+                <td>{{ result.w_net|floatformat:3 }}</td>
+            </tr>
+            {% endfor %}
                         </tbody>
-                    </table>
+        </table>
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-6">
@@ -187,17 +187,17 @@
                 </div>
                 <div class="small text-muted mt-2">For design, use the most critical (highest magnitude) value for each zone.</div>
             </div>
-        </div>
+    </div>
 
         <!-- Calculation Steps -->
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-light d-flex align-items-center">
                 <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Calculation Steps &amp; Explanations</h5>
-            </div>
+    </div>
             <div class="card-body">
                 <div class="accordion" id="calculationSteps">
-                    {% for step in steps %}
-                    <div class="accordion-item">
+        {% for step in steps %}
+        <div class="accordion-item">
                         <h2 class="accordion-header" id="heading{{ forloop.counter }}">
                             <button class="accordion-button collapsed" type="button" 
                                     data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}">
