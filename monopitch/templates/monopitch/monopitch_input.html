@@ -5,7 +5,7 @@
 <div class="container mt-5">
     <h2>Monopitch Roof Wind Load Calculator</h2>
     <p>Calculate wind pressure loads on monopitch roofs per Eurocode 1 (EN 1991-1-4:2005+A1:2010, Section 7.2). Enter the parameters below and click the info icon for details on each input.</p>
-    <form method="post" action="{% url 'monopitch_calculate' %}">
+    <form method="post" action="{% url 'monopitch:monopitch_calculate' %}">
         {% csrf_token %}
         <div class="row">
             {% for field in form %}

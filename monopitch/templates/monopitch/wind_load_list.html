@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Wind Load Calculations - Monopitch Roof{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Wind Load Calculations</h1>
+        <a href="{% url 'monopitch:wind_load_calculation' %}" class="btn btn-primary">New Calculation</a>
+    </div>
+
+    {% if calculations %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Basic Wind Velocity</th>
+                            <th>Terrain Category</th>
+                            <th>Height to Eaves</th>
+                            <th>Height to Ridge</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for calculation in calculations %}
+                        <tr>
+                            <td>{{ calculation.calculation_name|default:"Unnamed Calculation" }}</td>
+                            <td>{{ calculation.vb0 }} m/s</td>
+                            <td>{{ calculation.get_terrain_description }}</td>
+                            <td>{{ calculation.h_e }} m</td>
+                            <td>{{ calculation.h_r }} m</td>
+                            <td>{{ calculation.created_at|date:"Y-m-d H:i" }}</td>
+                            <td>
+                                <a href="{% url 'monopitch:wind_load_detail' calculation.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p class="mb-0">No wind load calculations found. <a href="{% url 'monopitch:wind_load_calculation' %}">Create your first calculation</a>.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

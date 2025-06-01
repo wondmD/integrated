@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Wind Load Calculation Results - Monopitch Roof{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Wind Load Calculation Results</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Calculation Details</h2>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Calculation Name</dt>
+                <dd class="col-sm-9">{{ calculation.calculation_name|default:"Unnamed Calculation" }}</dd>
+
+                <dt class="col-sm-3">Basic Wind Velocity (V_b0)</dt>
+                <dd class="col-sm-9">{{ calculation.vb0 }} m/s</dd>
+
+                <dt class="col-sm-3">Directional Factor (C_direction)</dt>
+                <dd class="col-sm-9">{{ calculation.c_direction }}</dd>
+
+                <dt class="col-sm-3">Seasonal Factor (C_season)</dt>
+                <dd class="col-sm-9">{{ calculation.c_season }}</dd>
+
+                <dt class="col-sm-3">Air Density (ρ)</dt>
+                <dd class="col-sm-9">{{ calculation.rho }} kg/m³</dd>
+
+                <dt class="col-sm-3">Terrain Category</dt>
+                <dd class="col-sm-9">{{ calculation.get_terrain_description }}</dd>
+
+                <dt class="col-sm-3">Height to Eaves (h_e)</dt>
+                <dd class="col-sm-9">{{ calculation.h_e }} m</dd>
+
+                <dt class="col-sm-3">Height to Ridge (h_r)</dt>
+                <dd class="col-sm-9">{{ calculation.h_r }} m</dd>
+
+                {% if calculation.notes %}
+                <dt class="col-sm-3">Notes</dt>
+                <dd class="col-sm-9">{{ calculation.notes }}</dd>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Calculation Steps</h2>
+        </div>
+        <div class="card-body">
+            {% for step in explanation %}
+            <div class="mb-4">
+                <h3 class="h6">{{ step.title }}</h3>
+                <p>{{ step.description }}</p>
+                
+                {% if step.formula %}
+                <div class="alert alert-light">
+                    <p class="mb-0">Formula: {{ step.formula|safe }}</p>
+                </div>
+                {% endif %}
+
+                {% if step.values %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in step.values.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+
+                {% if step.result %}
+                <div class="alert alert-info">
+                    <p class="mb-0">Result: {{ step.result }}</p>
+                </div>
+                {% endif %}
+
+                {% if step.reference %}
+                <small class="text-muted">Reference: {{ step.reference }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Results by Zone</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Zone</th>
+                            <th>Area (m²)</th>
+                            <th>C_pe</th>
+                            <th>Net Wind Pressure (kN/m²)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                        <tr>
+                            <td>{{ result.zone }}</td>
+                            <td>{{ result.area|floatformat:2 }}</td>
+                            <td>{{ result.C_pe|floatformat:2 }}</td>
+                            <td>{{ result.w_e|floatformat:3 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <a href="{% url 'monopitch:wind_load_calculation' %}" class="btn btn-primary">New Calculation</a>
+        <a href="{% url 'monopitch:wind_load_list' %}" class="btn btn-secondary">View All Calculations</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock %} 
